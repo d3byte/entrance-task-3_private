@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <title>Яндекс.Переговорки</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/kube.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/button-size.css" rel="stylesheet">
+    <link href="css/media.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body>
+    <header class="main-page">
+        <img src="desktop-assets/logo.svg">
+        <a href="new-meeting.html" class="button-wrapper">
+            <button class="button blue">Создать встречу</button>
+        </a>
+        <div class="date">
+            <div class="icon-container previous">
+                <img src="desktop-assets/arrow2.svg">
+            </div>
+            <h5>14 дек. &#183; Сегодня </h5>
+            <div class="icon-container next">
+                <img src="desktop-assets/arrow.svg">
+            </div>
+        </div>
+        <div class="calendar hide">
+            <div class="wrapper">
+            </div>
+        </div>
+    </header>
+
+    <main class="main-page">
+        <div class="left-bar">
+            <div class="date">
+                <div class="icon-container previous">
+                    <img src="desktop-assets/arrow2.svg">
+                </div>
+                <h5>14 дек. &#183; Сегодня </h5>
+                <div class="icon-container next">
+                    <img src="desktop-assets/arrow.svg">
+                </div>
+            </div>
+            <div class="calendar hide">
+                <div class="wrapper">
+                </div>
+            </div>
+            <div class="floor-container f-7">
+                <div class="floor-num">7 этаж</div>
+                <ul class="rooms">
+                    <li class="room r-1 disabled">
+                        <span class="title">Ржавый Фред</span>
+                        <br>
+                        <span class="capacity">3–6 человек</span>
+                    </li>
+                    <li class="room r-2">
+                        <span class="title">Прачечная</span>
+                        <br>
+                        <span class="capacity">До 10 человек</span>
+                    </li>
+                    <li class="room r-3">
+                        <span class="title">Жёлтый Дом</span>
+                        <br>
+                        <span class="capacity">До 10 человек</span>
+                    </li>
+                    <li class="room r-4 disabled">
+                        <span class="title">Оранжевый тюльпан</span>
+                        <br>
+                        <span class="capacity">До 10 человек</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="floor-container f-6">
+                <div class="floor-num">6 этаж</div>
+                <ul class="rooms">
+                    <li class="room r-1">
+                        <span class="title">Джокер</span>
+                        <br>
+                        <span class="capacity">3–6 человек</span>
+                    </li>
+                    <li class="room r-2">
+                        <span class="title">Мариванна</span>
+                        <br>
+                        <span class="capacity">3–6 человек</span>
+                    </li>
+                    <li class="room r-3">
+                        <span class="title">Тонкий Боб</span>
+                        <br>
+                        <span class="capacity">3–6 человек</span>
+                    </li>
+                    <li class="room r-4">
+                        <span class="title">Чёрная Вдова</span>
+                        <br>
+                        <span class="capacity">3–6 человек</span>
+                    </li>
+                    <li class="room r-5">
+                        <span class="title">Белорусский ликёр</span>
+                        <br>
+                        <span class="capacity">3–6 человек</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="right-bar">
+            <div class="timeline">
+            </div>  
+        </div>
+    </main>
+
+    <div id="created-meeting" class="modal-box hide">
+        <div class="modal">
+            <div class="modal-body">
+                <div class="col centered">
+                    <img src="desktop-assets/emoji2.svg">
+                    <h4>Встреча создана!</h4>
+                    <p class="text-center">
+                        14 декабря, 15:00–17:00 <br>
+                        Готем &#183; 4 этаж
+                    </p>
+                </div>
+                <div class="row centered">
+                    <button class="button blue" data-action="modal-close">Хорошо</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/jquery.min.js"></script>
+    <script src="js/kube.min.js"></script>
+    <script src="js/timeline.js"></script>
+    <script src="js/tooltip.js"></script>
+    <script src="js/room-highlighter.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/imitate-meeting-creation.js"></script>
+    <script src="js/main-scroll.js"></script>
+
+</body>
+
+</html>
