@@ -293,7 +293,6 @@ function hideMeetingCalendar(e) {
             clickedPlace.parentElement.classList && clickedPlace.parentElement.classList.contains(className)
         ) {
             clickedDate = true
-            document.querySelector('header').innerHTML = ''
         }
     })
     // Если нажат не календарь, то закрываю меню сразу. Если календарь, то закрываю после того,

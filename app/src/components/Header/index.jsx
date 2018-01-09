@@ -8,7 +8,7 @@ export default class Header extends Component {
   render() {
     const { path } = this.props
     return (
-        <header className={path == '/' ? 'main-page' : ''}>
+        <header className={path === '/' ? 'main-page' : ''}>
             <img src={logo} alt="logo"/>
             {
                 path == '/' && (
@@ -16,7 +16,7 @@ export default class Header extends Component {
                         <a href="new-meeting.html" className="button-wrapper">
                             <button className="button blue">Создать встречу</button>
                         </a>
-                        <Calendar/>
+                        <Calendar path={path}/>
                     </div>
                 )
             }
