@@ -377,24 +377,12 @@ export default class Calendar extends Component {
 
   render() {
     return (
-      <div>
-        <div className="date">
-            <div className="icon-container previous">
-                <img src="desktop-assets/arrow2.svg" alt="ui-element" />
-            </div>
-            <h5>14 дек. &#183; Сегодня </h5>
-          <h5>{this.state.h5}</h5>
-            <div className="icon-container next">
-                <img src="desktop-assets/arrow.svg" alt="ui-element" />
-            </div>
-        </div>
-        <div className={'calendar hide ' + this.props.editor ? 'editor' : ''}>
-            <div className="wrapper">
-              {
-                this.state.months.map(month => month)
-              }
-            </div>
-        </div>
+      <div className={this.props.editor ? 'calendar hide editor' : 'calendar hide'}>
+          <div className="wrapper">
+            {
+              this.state.months.map(month => month)
+            }
+          </div>
       </div>
     )
   }
