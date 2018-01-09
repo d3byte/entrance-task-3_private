@@ -1,0 +1,304 @@
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1500px;
+  }
+}
+
+@media (max-width: 870px) {
+  .container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none;
+  }
+  header.main-page .calendar, header.main-page .date {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .row {
+    flex-direction: row !important;
+  }
+  .hide-mobile {
+    display: none;
+  }
+  footer {
+    padding: 0;
+    flex-direction: column;
+    background: transparent !important;
+  }
+  footer .btns {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    width: 100%;
+    background: white;
+  }
+  footer .hide-desktop {
+    padding: 12px 16px;
+    background: rgba(0, 16, 33, 0.8);
+    color: white;
+    width: 100%;
+    font-size: 16px;
+  }
+  button {
+    font-size: 16px !important;
+  }
+  .body-wrapper.marg-b {
+    margin-bottom: 90px;
+  }
+  .body-wrapper.marg-b-sm {
+    margin-bottom: 60px;
+  }
+  .blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 16, 33, 0.8);
+    z-index: 700;
+  }
+  header.main-page {
+    background: white;
+    flex-direction: column;
+    padding: 15px 0 0 0;
+    align-items: flex-start;
+  }
+  header.main-page > img {
+    margin: 0 0 15px 25px;
+  }
+  header.main-page .button-wrapper {
+    display: none;
+  }
+  header.main-page .date {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 15px 25px;
+    border-top: 1px solid #E9ECEF;
+  }
+  header.main-page .date h5 {
+    margin: 0;
+  }
+  header.main-page .calendar {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: 1px solid #E9ECEF;
+    box-shadow: 0 1px 16px 0 rgba(0, 44, 92, 0.28);
+    top: 115px;
+  }
+  header.main-page .calendar .wrapper {
+    border-radius: 8px;
+  }
+  main.main-page {
+    position: relative;
+    padding-bottom: 10px;
+  }
+  main.main-page .left-bar .date, main.main-page .left-bar .calendar {
+    display: none;
+  }
+  .calendar + .floor-container {
+    padding: 50px 0 0 0 !important;
+  }
+  .calendar + .floor-container > .floor-num {
+    border-top: 1px solid  #E9ECEF !important;
+  }
+  .floor-container {
+    border-right: none !important;
+    padding: 0 0 0 0 !important;
+  }
+  .floor-container .floor-num {
+    padding: 16px 0 4px 25px;
+    background: #f7f8f9;
+    font-weight: bold;
+  }
+  .right-bar .timeline .time-area .floor {
+    margin-bottom: 44px;
+  }
+  .right-bar .timeline .time-area .floor:last-of-type {
+    margin-bottom: 0 !important;
+  }
+  .right-bar .timeline .time-area .timing + .floors .floor:first-of-type .room:first-of-type {
+    margin-top: 44px;
+  }
+  .right-bar .timeline .time-area .rows .room,
+  .right-bar .timeline .time-area .rows .room button,
+  .left-bar .floor-container ul.rooms li.room {
+    box-sizing: border-box !important;
+    height: 58px;
+    border-bottom: 1px solid #E9ECEF !important;
+    margin: 0;
+  }
+  .left-bar .floor-container ul.rooms {
+    width: 100% !important;
+  }
+  .left-bar .floor-container ul.rooms li.room {
+    padding: 8px 0 8px 25px !important;
+    width: 100% !important;
+    z-index: 1000;
+  }
+  .left-bar {
+    width: 60%;
+  }
+  .right-bar {
+    width: 40%;
+  }
+  .right-bar.scrolled {
+    width: 100%;
+  }
+  .right-bar.scrolled .timeline .time-area .floor .room .scrolled-tag {
+    display: block;
+  }
+  .right-bar.scrolled .timeline .time-area:first-of-type {
+    margin-left: 0;
+  }
+  .right-bar.scrolled .timeline .time-area .floor span.floor-num {
+    display: block;
+  }
+  .tooltip {
+    z-index: 999999;
+  }
+}
+
+@media (max-width: 648px) {
+  .row {
+    flex-direction: column !important;
+    margin: 0 !important;
+  }
+  .row.space-between {
+    margin-bottom: 16px !important;
+  }
+  .modal-box {
+    top: unset !important;
+    bottom: 0 !important;
+  }
+  .modal-body > .row.centered {
+    flex-direction: row !important;
+  }
+  .row-col {
+    width: 100% !important;
+    margin-bottom: 16px;
+  }
+  .row-col.input-date {
+    flex-wrap: wrap;
+  }
+  .row-col.input-date .labeled-input.date {
+    width: 100%;
+    margin: 0 0 8px 0;
+  }
+  .row-col.input-date .labeled-input.time {
+    width: 45%;
+  }
+  .row-col.input-date .labeled-input.time label {
+    display: none;
+  }
+  .row-col.input-date span {
+    margin: 0 2.5% 0 2.5%;
+  }
+  .container {
+    padding: 25px 0 0 0;
+    margin-bottom: 0;
+  }
+  .row {
+    padding: 0 20px;
+  }
+  .row.gray {
+    padding: 0;
+    background: #E9ECEF;
+  }
+  .row.gray .row-col {
+    padding: 10px 20px;
+    background: white;
+  }
+  .row.gray .row-col:first-of-type {
+    margin-top: 16px;
+  }
+  .row:last-of-type {
+    margin-bottom: 0;
+  }
+  .invited-people .invited-person {
+    width: 100%;
+  }
+  footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    background: white;
+  }
+  button.save {
+    margin-left: 16px;
+  }
+  .main-page .calendar {
+    width: 100%;
+    left: 0;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  header .calendar, header .calendar .wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+  header .calendar .month, header .calendar .wrapper .month {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 450px) {
+  .left-bar .floor-container ul.rooms li.room .title {
+    font-size: 14px;
+  }
+  .left-bar .floor-container ul.rooms li.room .capacity {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 400px) {
+  .modal-box > .modal.open {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 342px) {
+  .labeled-room .room .info > .time {
+    margin-right: 5px !important;
+    font-size: 12px;
+  }
+  .labeled-room .room .info > .time + .location {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1920px) {
+  header {
+    padding: 30px 60px;
+  }
+  main.main-page .left-bar {
+    width: 400px;
+  }
+  main.main-page .left-bar .date {
+    padding: 10px 0 10px 60px;
+  }
+  main.main-page .left-bar .floor-container {
+    padding: 30px 60px 0 60px;
+  }
+  main.main-page .left-bar .date > .icon-container:first-of-type {
+    margin-right: 30px;
+  }
+  main.main-page .left-bar .date > h5 {
+    margin: 0 30px 0 0;
+  }
+  main.main-page .right-bar .timeline .time-area {
+    flex: 0 0 120px;
+  }
+}
+/*# sourceMappingURL=media.css.map */

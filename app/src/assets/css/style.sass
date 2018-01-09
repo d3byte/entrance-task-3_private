@@ -1,0 +1,587 @@
+$light-gray: #E9ECEF
+$li-gray: #F6F7F9
+$dark-gray: #858E98
+$light-blue: #007DFF
+$medium-blue: #0059FF
+$dark-blue: #0B00FF
+$text-blue: #0070E0
+$column-border-color: rgba(19,100,205,0.10)
+$room-taken: #D5DFE9
+$room-hover: #1D54FE
+$room-pressed: #1D00FE
+$column-show-tooltip: #99A9B9
+
+
+
+=shadow
+  box-shadow: 0 1px 16px 0 rgba(0,44,92,0.28)
+
+=no-outline
+  outline: 0 none
+  -webkit-box-shadow: none
+  box-shadow: none
+
+
+
+=flex-vertical-center
+  display: flex
+  align-items: center
+
+
+
+=centered
+  +flex-vertical-center
+  justify-content: center
+
+
+
+=centered-col
+  +centered
+  flex-direction: column
+
+
+
+=space-between
+  +flex-vertical-center
+  justify-content: space-between
+
+
+
+*
+  font-family: 'Roboto', sans-serif
+
+
+
+header, footer
+  +flex-vertical-center
+  padding: 25px
+  box-shadow: 0 1px 0 0 $light-gray
+
+
+
+header.main-page
+  justify-content: space-between
+
+
+
+footer
+  width: 100%
+  justify-content: center
+  box-shadow: 0 -1px 0 0 $light-gray
+
+
+
+.footer-to-bottom
+  display: flex
+  flex-direction: column
+  justify-content: space-between
+  min-height: 100vh
+
+
+
+.container
+  margin: auto
+  max-width: 860px
+  padding: 30px 0
+  .row
+    margin: 0 0 30px 0
+    h4
+      margin: 0
+    &.space-between
+      justify-content: space-between
+    &.auto > .row-col
+      width: 47.5%
+    &.auto.gutters > .row-col:first-of-type
+      margin-right: 5%
+
+
+
+.col.centered
+  +centered-col
+  h4
+    text-align: center
+
+
+
+.icon-container
+  +centered
+  width: 30px
+  height: 30px
+  background: #E9ECEF
+  border-radius: 100px
+  &:hover
+    cursor: pointer
+
+
+
+.labeled-input
+  label
+    font-weight: bold
+  input
+    transition: 0.2s
+    border: 2px solid $light-gray
+    border-radius: 4px
+    &:focus
+      +no-outline
+      border-color: $light-blue
+  &.time > input
+    padding: 2px 0
+    text-align: center
+
+.input-date
+  +space-between
+  position: relative
+  .labeled-input.date
+    position: relative
+    width: 65%
+    margin-right: 5%
+    img
+      position: absolute
+      transition: 0.2s
+      right: 15px
+      bottom: 15px
+      opacity: 0.4
+  .labeled-input.time
+    width: 20%
+    &:first-of-type
+      margin-right: 5%
+  span
+    font-size: 20px
+    font-weight: bold
+    margin: 25px 2.5% 0 2.5%
+
+
+
+.input-dropdown
+  width: 100%
+  max-height: 150px
+  margin-top: -0.5px
+  box-shadow: 0px 6px 10px  #E9ECEF, 4px 4px 10px  #E9ECEF, -4px 6px 10px  #E9ECEF
+  border-radius: 4px
+  overflow-y: scroll
+  // display: none
+  ul.people
+    margin: 0
+    list-style-type: none
+    li.person
+      display: flex
+      align-items: center
+      padding: 5px 15px
+      font-size: 14px
+      font-weight: normal
+      vertical-align: middle
+      img
+        width: 24px
+        height: 24px
+        border-radius: 100px
+        border: 1px solid $light-gray
+        margin-right: 10px
+      span.floor, span.dot
+        font-weight: normal
+        margin-left: 5px
+        color: #ccc
+        vertical-align: middle
+      span.dot, span.name
+        color: black
+      &:hover, &.suitable
+        background: $li-gray
+        span
+          font-weight: bold
+
+
+
+.invited-people
+  display: flex
+  flex-wrap: wrap
+  margin-top: 12px
+  .invited-person
+    +space-between
+    width: 45%
+    background: $light-gray
+    border-radius: 16px
+    padding: 0
+    margin: 0 8px 8px 0
+    .person-wrapper
+      display: flex
+      align-items: center
+      font-size: 14px
+      color: black
+      img.avatar
+        background: gray
+        width: 24px
+        height: 24px
+        border-radius: 100px
+        margin-right: 10px
+    img.icon
+      width: 9px
+      margin-right: 12px
+      &:hover
+        cursor: pointer
+
+
+
+.labeled-room
+  label
+    font-weight: bold
+  .room
+    +space-between
+    padding: 10px
+    height: 36px
+    border-radius: 4px
+    .info
+      & > span
+        font-size: 14px
+        color: white
+        font-weight: normal
+        font-family: 'Roboto', sans-serif
+      & > .time
+        font-weight: bold
+        margin-right: 15px
+    img
+      margin-right: 4px
+    &:hover
+      cursor: pointer
+  &.active
+    .room:hover
+      cursor: default
+    .room > img:hover
+      cursor: pointer  
+  &.list > .room
+    background: $light-gray
+    margin-bottom: 10px
+    span
+      color: black
+  &.active > .room
+    background: $light-blue
+
+
+
+button.button
+  transition: 0.2s
+  height: 25px !important
+  padding: 0px 20px !important
+  border-radius: 4px !important
+  background: $light-gray
+  color: black
+  margin: 0 20px 0 0
+  font-size: 14px
+  &:last-of-type
+    margin-right: 0
+  &.blue
+    background: $light-blue
+    color: white
+  &:hover
+    background: $medium-blue
+  &:active
+    background: $dark-blue
+  &:disabled
+    background: $light-gray
+    color: rgba(0,0,0,0.20)
+
+
+
+a.button-wrapper
+  margin: 0 0 0 20px
+  & + button
+    margin: 0 0 0 20px
+  &:first-of-type
+    margin: 0
+
+
+
+.modal.open
+  width: 400px !important
+.modal-body > .row.centered
+  +centered
+  padding: 10px
+  img
+    width: 42px
+    height: 42px
+
+
+
+main.main-page
+  display: flex
+  flex-flow: row nowrap
+
+.left-bar
+  position: relative
+  width: 305px
+  transition: 0.3s
+  .date
+    +flex-vertical-center
+    padding: 10px 0 10px 25px
+    width: 100%
+    box-shadow: 0 1px 0 0 $light-gray
+    & > .icon-container:first-of-type
+        margin-right: 20px
+    & > h5
+      margin: 0 20px 0 0
+      &:hover
+        cursor: pointer
+  .floor-container
+    border-right: 1px solid $light-gray
+    padding: 30px 25px 0 25px
+    .floor-num
+      font-size: 12px
+      text-transform: uppercase
+      color: $dark-gray
+    ul.rooms
+      margin: 0
+      list-style-type: none
+      li.room
+        padding: 8px 0
+        line-height: 20px
+        .title
+          font-size: 16px
+          font-weight: bold
+        .capacity
+          font-size: 14px
+          font-weight: normal
+        &.disabled > span
+          color: $dark-gray
+        &.active > .title
+          color: $text-blue
+
+.calendar
+  position: absolute
+  left: 25px
+  top: 50px
+  width: 605px
+  height: 230px
+  background: white
+  border-radius: 4px
+  padding: 16px
+  +shadow
+  z-index: 7000
+  &.editor
+    top: 70px
+    left: 0
+    width: 250px
+    height: 200px
+    .month:first-of-type
+      transform: scale(0.9) !important
+  .wrapper
+    +flex-vertical-center
+    justify-content: center
+    background: $light-gray
+    width: 100%
+    height: 100%
+    .month
+      text-align: center
+      margin-right: 30px
+      transform: scale(0.9)
+      &:first-of-type, &:last-of-type
+        transform: scale(0.8)
+      &:last-of-type
+        margin: 0
+      .month-name
+        font-weight: bold
+        margin-bottom: 5px
+      table
+        margin: 0
+        td
+          padding: 2px 4px
+          border: none
+          &:hover
+            cursor: pointer
+          &.today
+            background: #98A9B9
+            font-weight: bold
+            color: white
+            border-radius: 4px
+
+.right-bar
+  overflow-x: scroll
+  width: calc(100% - 305px)
+  .timeline
+    +flex-vertical-center
+    width: 100%
+    .time-area
+      flex: 0 0 60px
+      white-space: nowrap
+      &:first-of-type
+        margin-left: -25px
+      &.current
+        position: relative
+        .timing
+          position: relative
+          & > .hours
+            position: absolute
+            right: 0
+          & > span:last-of-type
+            display: block
+            padding: 0 10px
+            border-radius: 100px
+            color: white
+            background: $light-blue
+            z-index: 5000
+      .floors
+        display: flex
+        flex-direction: column
+        margin-top: 1px
+        background: $li-gray
+        border-right: 1px solid $column-border-color
+      .timing
+        +flex-vertical-center
+        justify-content: left
+        padding: 10px 0
+        height: 50px
+        box-shadow: 0 1px 0 0 $light-gray
+        border-top: 1px solid $light-gray
+        background: white
+        & > span
+          margin-right: -4px
+          font-weight: bold
+          font-size: 10px
+          color: $dark-gray
+          z-index: 1000
+        & + .floors .floor:first-of-type .room:first-of-type
+          margin-top: 65px
+      .floor
+        position: relative
+        margin-bottom: 72px
+        background: $li-gray
+        span.floor-num
+          display: none
+          position: absolute
+          left: 10px
+          top: -25px
+          z-index: 5000
+          font-size: 11px
+          font-weight: bold
+          text-transform: uppercase
+          color: $dark-gray
+        &:first-of-type > span.floor-num
+          top: 20px
+      .rows
+        width: 100%
+        .room
+          position: relative
+          height: 35px
+          background: $room-taken
+          margin-bottom: 22px
+          transition: 0.2s
+          &:last-of-type
+            margin-bottom: 0
+          & > a button
+            transition: 0.2s
+            width: 100%
+            min-height: 35px
+            padding: 0
+            background: white !important
+            border: none
+            border-radius: 0
+          &:hover > a button
+            cursor: pointer
+            background: $room-hover
+            border-radius: 2px
+            &:active
+              background: $room-pressed
+          & > .scrolled-tag
+            display: none
+            position: absolute
+            border-radius: 4px
+            background: white
+            padding: 5px 8px
+            z-index: 5900
+            left: 10px
+            top: 0
+            +shadow
+          &.active
+            background: $column-show-tooltip
+
+
+
+.tooltip
+  position: absolute
+  top: 35px
+  left: 0
+  z-index: 6000
+  background: white
+  border-radius: 8px
+  +shadow
+  height: 120px
+  width: 340px
+  padding: 8px 16px
+  .header
+    +flex-vertical-center
+    justify-content: space-between
+    .title
+      display: block
+      font-weight: bold
+      font-size: 16px
+      margin-top: 8px
+    .icon-container
+      width: 24px
+      height: 24px
+      img
+        width: 10px
+        height: 10px
+  .time
+    margin-top: 2px
+    span
+      font-size: 14px
+      &.dot
+        margin: 0 5px
+  .participants
+    +flex-vertical-center
+    margin-top: 15px
+    .avatar
+      +centered
+      width: 24px
+      height: 24px
+      border-radius: 50%
+      border: 1px solid $light-gray 
+      margin-right: 5px
+    span
+      font-weight: normal
+      font-size: 14px
+      margin-right: 5px
+      &.left
+        color: gray
+  &:before
+    content: ''
+    position: absolute
+    top: -5px
+    left: calc(50% - 5px)
+    background: white
+    border-radius: 2px
+    width: 15px
+    height: 15px
+    transform: rotate(135deg)
+
+  
+#modal-overlay
+  z-index: 50000
+  background: rgba(0,16,33,0.40)
+
+#created-meeting, .modal-box
+  z-index: 70000
+
+#created-meeting .modal-body h4
+    margin-bottom: 16px
+  
+
+
+.row-col.delete
+  padding: 0 !important
+  .delete-button
+    padding: 20px 0
+    width: 100%
+    height: 100%
+    background: white
+    text-align: center
+    color: #FF3333
+    transition: 0.3s
+    &:hover
+      background: white
+      color: #FF3333
+    &:active, &:focus
+      background: #FF3333
+      color: white
+
+
+
+a
+  text-decoration: none !important
