@@ -177,8 +177,10 @@ export default class Calendar extends Component {
     if (this.screenWidth <= 768) {
       calendar = document.querySelector('header .calendar')
     } else {
+      console.log('else calendar')
       calendar = document.querySelector('main .calendar')
     }
+    console.log(calendar)
     if (calendar.classList.contains('hide')) {
       calendar.classList.remove('hide')
       if (this.screenWidth <= 648) {
@@ -329,23 +331,35 @@ export default class Calendar extends Component {
     this.setState({ h5: text })
 
     if (this.screenWidth <= 768) {
-      document.querySelector('header .date h5').innerHTML = text
-      document.querySelector('header .date h5').addEventListener('click', () => this.toggleCalendar())
-      document.querySelector('header .date .next').addEventListener('click', () => {
-        this.nextDay([previousMonth, currentMonth, nextMonth])
-      })
-      document.querySelector('header .date .previous').addEventListener('click', () => {
-        this.prevDay([previousMonth, currentMonth, nextMonth])
+      document.addEventListener('header-rendered', () => {
+        console.log('header-rendered event fired')
+        document.querySelector('header .date h5').innerHTML = text
+        const toggle = new Event('toggle-header-calendar')
+        document.dispatchEvent(toggle)
+        document.querySelector('header .date h5').addEventListener('click', () => this.toggleCalendar())
+        document.querySelector('header .date .next').addEventListener('click', () => {
+          this.nextDay([previousMonth, currentMonth, nextMonth])
+        })
+        document.querySelector('header .date .previous').addEventListener('click', () => {
+          this.prevDay([previousMonth, currentMonth, nextMonth])
+        })
       })
     } else {
-      document.querySelector('.left-bar .date h5').innerHTML = text
-      document.querySelector('.left-bar .date h5').addEventListener('click', () => this.toggleCalendar())
-      document.querySelector('.left-bar .date .next').addEventListener('click', () => {
-        this.nextDay([previousMonth, currentMonth, nextMonth])
+      console.log('else')
+      document.addEventListener('left-bar-rendered', () => {
+        console.log('left-bar-rendered event fired')
+        const toggle = new Event('toggle-left-bar-calendar')
+        document.dispatchEvent(toggle)
+        document.querySelector('.left-bar .date h5').innerHTML = text
+        document.querySelector('.left-bar .date h5').addEventListener('click', () => this.toggleCalendar())
+        document.querySelector('.left-bar .date .next').addEventListener('click', () => {
+          this.nextDay([previousMonth, currentMonth, nextMonth])
+        })
+        document.querySelector('.left-bar .date .previous').addEventListener('click', () => {
+          this.prevDay([previousMonth, currentMonth, nextMonth])
+        })
       })
-      document.querySelector('.left-bar .date .previous').addEventListener('click', () => {
-        this.prevDay([previousMonth, currentMonth, nextMonth])
-      })
+      
     }
   }
 
@@ -370,9 +384,9 @@ export default class Calendar extends Component {
     const { path } = this.props
     if (path !== '/new' && path !== '/edit') {
       this.fillMainCalendar()
-    } else {
-      this.fillMeetingCalendar()
+      return
     }
+     this.fillMeetingCalendar()
   }
 
   render() {
