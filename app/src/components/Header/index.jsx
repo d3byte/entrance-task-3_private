@@ -41,5 +41,5 @@ export default class Header extends Component {
                 { path === '/' && <Calendar path={path} /> }
             </header>
         )
-  }
+    }
 }
