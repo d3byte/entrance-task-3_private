@@ -13,24 +13,13 @@ export default class Calendar extends Component {
 
     this.dayChanged = new Event('day-changed')
     this.screenWidth = window.screen.innerWidth || document.clientWidth || document.body.clientWidth
-
-    this.getMonthInfo = this.getMonthInfo.bind(this)
-    this.changeDay = this.changeDay.bind(this)
-    this.chooseDay = this.chooseDay.bind(this)
-    this.createMonth = this.createMonth.bind(this)
-    this.toggleCalendar = this.toggleCalendar.bind(this)
-    this.nextDay = this.nextDay.bind(this)
-    this.prevDay = this.prevDay.bind(this)
-    this.showMeetingCalendar = this.showMeetingCalendar.bind(this)
-    this.fillMainCalendar = this.fillMainCalendar.bind(this)
-    this.fillMeetingCalendar = this.fillMeetingCalendar.bind(this)
   }
 
-  daysInMonth(month, year) {
+  daysInMonth = (month, year) => {
     return new Date(year, month, 0).getDate()
   }
 
-  getMonthName(month) {
+  getMonthName = month => {
     const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
       "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     ]
@@ -38,7 +27,7 @@ export default class Calendar extends Component {
     return monthNames[month]
   }
 
-  getMonthIndex(name) {
+  getMonthIndex = name => {
     const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
       "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
     ]
@@ -46,11 +35,11 @@ export default class Calendar extends Component {
     return monthNames.indexOf(name)
   }
 
-  getMonthInfo(month, year) {
-    if (month == -1) {
+  getMonthInfo = (month, year) => {
+    if (month === -1) {
       year -= 1
       month = 11
-    } else if (month == 13) {
+    } else if (month === 13) {
       year += 1
       month = 0
     }
@@ -58,17 +47,15 @@ export default class Calendar extends Component {
     let daysAmount = this.daysInMonth(month, year),
       days = [],
       name = this.getMonthName(month),
-      iterationDay = 1,
-      iterated = 1
+      iterationDay = 1
 
-    iterationDay = 1
-    iterated = 1
+    
     for (var i = 1; i <= 6; i++) {
       var week = []
       for (var j = iterationDay; j <= daysAmount; j++) {
         week.push(j)
         iterationDay++
-        if ((iterationDay - 1) % 7 == 0) {
+        if ((iterationDay - 1) % 7 === 0) {
           break
         }
       }
@@ -77,22 +64,22 @@ export default class Calendar extends Component {
 
     return {
       name: name,
-      days: days.filter(week => week.length != 0)
+      days: days.filter(week => week.length !== 0)
     }
   }
 
   // TODO: Рефакторинг querySelector`ов
-  changeDay({ indexOfWeek, indexOfDay, indexOfMonth, month }, arrow = false) {
+  changeDay = ({ indexOfWeek, indexOfDay, indexOfMonth, month }, arrow = false) => {
     let day = month.days[indexOfWeek][indexOfDay],
       monthName = month.name.toLowerCase().slice(0, 3) + '.',
       h5 = `${day} ${monthName} &#183;`,
       currentMonth = this.getMonthName(new Date().getMonth())
 
-    if (month.name == currentMonth && day == (new Date().getDate() + 1)) {
+    if (month.name === currentMonth && day === (new Date().getDate() + 1)) {
       h5 += ' Завтра'
-    } else if (month.name == currentMonth && (day == new Date().getDate() - 1)) {
+    } else if (month.name === currentMonth && (day === new Date().getDate() - 1)) {
       h5 += ' Вчера'
-    } else if (month.name == currentMonth && day == new Date().getDate()) {
+    } else if (month.name === currentMonth && day === new Date().getDate()) {
       h5 += ' Сегодня'
     } else {
       monthName = month.name.toLowerCase().slice(0, month.name.length - 1) + 'я'
@@ -122,7 +109,7 @@ export default class Calendar extends Component {
       newToday.classList.add('today')
   }
 
-  chooseDay({ indexOfWeek, indexOfDay, indexOfMonth, month }) {
+  chooseDay = ({ indexOfWeek, indexOfDay, indexOfMonth, month }) => {
     let day = month.days[indexOfWeek][indexOfDay],
         monthName = month.name.toLowerCase().slice(0, month.name.length - 1) + 'я',
         text = `${day} ${monthName}, ${new Date().getFullYear()}`
@@ -131,7 +118,7 @@ export default class Calendar extends Component {
     document.querySelector('.calendar.editor').classList.add('hide')
   }
 
-  createMonth(monthInfo, current = false, index, editor = false) {
+  createMonth = (monthInfo, current = false, index, editor = false) => {
     let weeks = monthInfo.days.map((daysOfWeek, key) => {
       let days = daysOfWeek.map((day, i) => {
         const info = {
@@ -144,7 +131,7 @@ export default class Calendar extends Component {
           <td
             key={i}
             onClick={() => !editor ? this.changeDay(info) : this.chooseDay(info)}
-            className={'td ' + current && day == new Date().getDate() ? 'today' : ''}
+            className={'td ' + current && day === new Date().getDate() ? 'today' : ''}
           >
             {day}
           </td>
@@ -172,15 +159,13 @@ export default class Calendar extends Component {
     return month
   }
 
-  toggleCalendar() {
+  toggleCalendar = () => {
     let calendar
     if (this.screenWidth <= 768) {
       calendar = document.querySelector('header .calendar')
     } else {
-      console.log('else calendar')
       calendar = document.querySelector('main .calendar')
     }
-    console.log(calendar)
     if (calendar.classList.contains('hide')) {
       calendar.classList.remove('hide')
       if (this.screenWidth <= 648) {
@@ -196,11 +181,11 @@ export default class Calendar extends Component {
     }
   }
 
-  nextDay(months) {
+  nextDay = months => {
     var monthInfo = {}
     months[this.state.monthIndex - 1].days.map(week => {
       for (let day of week) {
-        if (day == (this.state.currentDay + 1)) {
+        if (day === (this.state.currentDay + 1)) {
           monthInfo = {
             month: months[this.state.monthIndex - 1],
             indexOfWeek: months[this.state.monthIndex - 1].days.indexOf(week),
@@ -210,9 +195,10 @@ export default class Calendar extends Component {
           break
         }
       }
+      return false
     })
     this.setState({ currentDay: this.state.currentDay + 1 })
-    if (this.state.currentDay > this.daysInMonth(this.getMonthIndex(months[this.state.monthIndex - 1].name), new Date().getFullYear()) && this.state.monthIndex != 3) {
+    if (this.state.currentDay > this.daysInMonth(this.getMonthIndex(months[this.state.monthIndex - 1].name), new Date().getFullYear()) && this.state.monthIndex !== 3) {
       this.setState({ currentDay: 0, monthIndex: this.state.monthIndex + 1 })
       monthInfo = {
         month: months[this.state.monthIndex - 1],
@@ -221,18 +207,18 @@ export default class Calendar extends Component {
         indexOfMonth: this.state.monthIndex
       }
       this.changeDay(monthInfo, true)
-    } else if (this.state.currentDay > this.daysInMonth(new Date().getMonth() + 1, new Date().getFullYear()) && this.state.monthIndex == 3) {
+    } else if (this.state.currentDay > this.daysInMonth(new Date().getMonth() + 1, new Date().getFullYear()) && this.state.monthIndex === 3) {
       return
     } else {
       this.changeDay(monthInfo, true)
     }
   }
 
-  prevDay(months) {
+  prevDay = months => {
     var monthInfo = {}
     months[this.state.monthIndex - 1].days.map(week => {
       for (let day of week) {
-        if (day == (this.state.currentDay - 1)) {
+        if (day === (this.state.currentDay - 1)) {
           monthInfo = {
             month: months[this.state.monthIndex - 1],
             indexOfWeek: months[this.state.monthIndex - 1].days.indexOf(week),
@@ -242,9 +228,10 @@ export default class Calendar extends Component {
           break
         }
       }
+      return false
     })
     this.setState({ currentDay: this.state.currentDay - 1 })
-    if (this.state.currentDay < 1 && this.state.monthIndex != 1) {
+    if (this.state.currentDay < 1 && this.state.monthIndex !== 1) {
       this.setState({
         monthIndex: this.state.monthIndex - 1,
         currentDay: this.daysInMonth(this.getMonthIndex(months[this.state.monthIndex - 2].name), new Date().getFullYear())
@@ -256,21 +243,21 @@ export default class Calendar extends Component {
         indexOfMonth: this.state.monthIndex
       }
       this.changeDay(monthInfo, true)
-    } else if (this.state.currentDay < 1 && this.state.monthIndex == 1) {
+    } else if (this.state.currentDay < 1 && this.state.monthIndex === 1) {
       return
     } else {
       this.changeDay(monthInfo, true)
     }
   }
 
-  hideMeetingCalendar(e) {
+  hideMeetingCalendar = e => {
     let allowedClasses = ['calendar', 'editor', 'wrapper', 'month', 'month-name',
       'table', 'tr', 'td'
     ],
       clickedDate = false,
       clickedPlace
 
-    if (e.type != 'click') {
+    if (e.type !== 'click') {
       clickedPlace = e.explicitOriginalTarget
     } else {
       clickedDate = e.target
@@ -281,17 +268,18 @@ export default class Calendar extends Component {
     if (activeDate) {
       activeDate.classList.remove('today')
     }
-    if (clickedPlace.tagName == 'TD') {
+    if (clickedPlace.tagName === 'TD') {
       clickedPlace.classList.add('today')
-    } else if (clickedPlace.parentElement.tagName == 'TD') {
+    } else if (clickedPlace.parentElement.tagName === 'TD') {
       clickedPlace.parentElement.classList.add('today')
     }
     allowedClasses.map(className => {
-      if (clickedPlace.classList && clickedPlace.classList.contains(className) ||
-        clickedPlace.parentElement.classList && clickedPlace.parentElement.classList.contains(className)
+      if ((clickedPlace.classList && clickedPlace.classList.contains(className)) ||
+        (clickedPlace.parentElement.classList && clickedPlace.parentElement.classList.contains(className))
       ) {
         clickedDate = true
       }
+      return false
     })
     // Если нажат не календарь, то закрываю меню сразу. Если календарь, то закрываю после того,
     // как дата обновлена
@@ -304,12 +292,12 @@ export default class Calendar extends Component {
     }
   }
 
-  showMeetingCalendar() {
+  showMeetingCalendar = () => {
     document.querySelector('.calendar.editor').classList.remove('hide')
     document.querySelector('body .container').addEventListener('click', e => this.hideMeetingCalendar(e))
   }
 
-  fillMainCalendar() {
+  fillMainCalendar = () => {
     let date = new Date(),
       day = date.getDate(),
       year = date.getFullYear(),
@@ -363,7 +351,7 @@ export default class Calendar extends Component {
     }
   }
 
-  fillMeetingCalendar() {
+  fillMeetingCalendar = () => {
     let date = new Date(),
       day = date.getDate(),
       year = date.getFullYear(),
@@ -380,7 +368,7 @@ export default class Calendar extends Component {
     document.querySelector('.labeled-input.date input').addEventListener('blur', e => this.hideMeetingCalendar(e))
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     const { path } = this.props
     if (path !== '/new' && path !== '/edit') {
       this.fillMainCalendar()
@@ -388,6 +376,11 @@ export default class Calendar extends Component {
     }
      this.fillMeetingCalendar()
   }
+
+  componentWillReceiveProps = nextProps => {
+    console.log(nextProps)
+  }
+  
 
   render() {
     return (
