@@ -14,16 +14,15 @@ export default class Leftbar extends Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
     const rendered = new Event('left-bar-rendered')
     document.dispatchEvent(rendered)
-    // Установить слушатель эвента на включение календаря
   }
 
-  render() {
+  render = () => {
     const { data, path } = this.props
     return (
-      <div className="left-bar">
+      <div className="left-bar" ref="leftbar">
         <div className="date">
           <div className="icon-container previous">
             <img src={leftArrow} alt="left-arrow" />
@@ -33,7 +32,7 @@ export default class Leftbar extends Component {
             <img src={rightArrow} alt="right-arrow" />
           </div>
         </div>
-        <Calendar show={this.state.showCalendar} path={path}/>
+        <Calendar path={path}/>
         <Floors data={data} />
       </div>
     )

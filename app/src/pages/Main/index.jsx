@@ -18,7 +18,7 @@ export default class Main extends Component {
       <div>
         <Header path={location.pathname} />
         <main className="main-page">
-          <Leftbar data={this.state.data}/>
+          <Leftbar path={location.pathname} data={this.state.data}/>
           <div className="right-bar">
             <div className="timeline">
             </div>
