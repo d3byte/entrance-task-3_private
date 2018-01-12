@@ -84,9 +84,9 @@ export default class Timeline extends Component {
 
     // Определяю текущее время
     determineTime = () => {
-        var date = new Date()
-        var hours = date.getHours()
-        var minutes = date.getMinutes()
+        const date = new Date()
+        const hours = date.getHours()
+        let minutes = date.getMinutes()
         if (minutes < 10) {
             minutes = "0" + minutes
         }
@@ -113,8 +113,9 @@ export default class Timeline extends Component {
 
     // Функция для высчитывания часов, затронутых эвентом
     hoursIncluded = (start, end) => {
-        var hours = []
+        let hours = []
         for (var i = start; i <= end; i++) {
+            // eslint-disable-next-line
             hours.push(parseInt(i))
         }
         return hours
@@ -122,9 +123,8 @@ export default class Timeline extends Component {
 
     // Обрабатываю полученные с сервера данные об эвентах
     handleEventData = data => {
-        let newData = []
-        data.map(event => {
-            let eventInfo = {
+        let newData = data.map(event => {
+            return {
                 id: event.id,
                 title: event.title,
                 floor: event.room.floor,
@@ -134,11 +134,10 @@ export default class Timeline extends Component {
                     capacity: event.room.capacity,
                     users: event.users
                 },
-                start: splitDate(event.dateStart),
-                end: splitDate(event.dateEnd),
-                hoursIncluded: hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
+                start: this.splitDate(event.dateStart),
+                end: this.splitDate(event.dateEnd),
+                hoursIncluded: this.hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
             }
-            newData.push(eventInfo)
         })
         return newData
     }
@@ -147,14 +146,15 @@ export default class Timeline extends Component {
     computeDataToRender = (currentTime, events) => {
         let data = []
 
-        const handledData = handleEventData(events)
+        const handledData = this.handleEventData(events)
 
-        for (var i = currentTime.hours - 3; i <= currentTime.hours; i++) {
-            var eventInfo = handledData.map(date => {
+        for (let i = currentTime.hours - 3; i <= currentTime.hours; i++) {
+            // eslint-disable-next-line
+            let eventInfo = handledData.map(date => {
                 if (date.hoursIncluded.includes(i))
                     return date
             })
-            if (i == currentTime.hours) {
+            if (i === currentTime.hours) {
                 data.push({
                     date: currentTime.time,
                     events: eventInfo.filter(event => event !== undefined)
@@ -175,8 +175,9 @@ export default class Timeline extends Component {
             })
         }
 
-        for (var i = currentTime.hours + 1; i < 24; i++) {
-            var eventInfo = handledData.map(date => {
+        for (let i = currentTime.hours + 1; i < 24; i++) {
+            // eslint-disable-next-line
+            let eventInfo = handledData.map(date => {
                 if (date.hoursIncluded.includes(i))
                     return date
             })
@@ -185,14 +186,15 @@ export default class Timeline extends Component {
                 events: eventInfo.filter(event => event !== undefined)
             })
         }
-        for (var i = 0; i < data[0].date; i++) {
-            var eventInfo = handledData.map(date => {
+        for (let i = 0; i < data[0].date; i++) {
+            // eslint-disable-next-line
+            let eventInfo = handledData.map(date => {
                 if (date.hoursIncluded.includes(i))
                     return date
             })
             data.push({
                 date: i,
-                events: eventInfo.filter(event => event != undefined)
+                events: eventInfo.filter(event => event !== undefined)
             })
         }
 
@@ -203,7 +205,10 @@ export default class Timeline extends Component {
     addStyle = currentTime => {
         const css = `
             main.main-page .right-bar .timeline .time-area.current .timing > span:last-of-type {
-                margin-right: -${23 + parseInt(currentTime.minutes)}px;
+                margin-right: -${
+                    // eslint-disable-next-line
+                    23 + parseInt(currentTime.minutes)
+                }px;
             }
             .current::before {
                 content: '';
@@ -228,26 +233,41 @@ export default class Timeline extends Component {
             }
             main.main-page .right-bar .timeline .time-area.current .timing > span {
                 ${currentTime.minutes > 22 ?
-                `margin-left: ${Math.abs(23 - parseInt(currentTime.minutes))}px;`
+                `margin-left: ${
+                    // eslint-disable-next-line
+                    Math.abs(23 - parseInt(currentTime.minutes))
+                }px;`
                 :
-                `margin-left: -${Math.abs(23 - parseInt(currentTime.minutes))}px;`
+                `margin-left: -${
+                    // eslint-disable-next-line
+                    Math.abs(23 - parseInt(currentTime.minutes))
+                }px;`
                 }
             }
             @media (min-width: 1920px) {
                 .current::before {
-                    left: ${2 * parseInt(currentTime.minutes)}px;
+                    left: ${
+                        // eslint-disable-next-line
+                        2 * parseInt(currentTime.minutes)
+                    }px;
                 }
 
                 main.main-page .right-bar .timeline .time-area.current .timing > span {
                     ${currentTime.minutes > 22 ?
-                    `margin-left: ${2 * Math.abs(11 - parseInt(currentTime.minutes))}px;`
+                    `margin-left: ${
+                        // eslint-disable-next-line
+                        2 * Math.abs(11 - parseInt(currentTime.minutes))
+                    }px;`
                     :
-                    `margin-left: -${2 * Math.abs(11 - parseInt(currentTime.minutes))}px;`
+                    `margin-left: -${
+                        // eslint-disable-next-line
+                        2 * Math.abs(11 - parseInt(currentTime.minutes))
+                    }px;`
                     }
                 }
             }`,
             head = document.head || document.getElementsByTagName('head')[0],
-            style = document.createElement('style');
+            style = document.createElement('style')
         style.type = 'text/css';
         if (style.styleSheet) {
             style.styleSheet.cssText = css;
@@ -263,6 +283,7 @@ export default class Timeline extends Component {
           events = this.handleEventData(events)
           this.setState({ events })
       })
+      console.log(this.state.events)
     }
     
 
