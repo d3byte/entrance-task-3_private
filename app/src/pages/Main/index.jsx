@@ -15,7 +15,7 @@ export default class Main extends Component {
         }
     }
 
-    fetchEvents = (ms) => {
+    fetchEvents = ms => {
         const events = [
             {
                 "id": "1",
@@ -81,6 +81,28 @@ export default class Main extends Component {
                     "title": "Карты",
                     "capacity": 4,
                     "floor": 7
+                },
+            },
+            {
+                "id": "4",
+                "title": "Jjjjoо",
+                "dateStart": "2017-12-28T21:59:00.309Z",
+                "dateEnd": "2017-12-28T23:00:00.309Z",
+                "users": [
+                    {
+                        "id": "1",
+                        "login": "veged"
+                    },
+                    {
+                        "id": "2",
+                        "login": "alt-j"
+                    }
+                ],
+                "room": {
+                    "id": "3",
+                    "title": "Карты",
+                    "capacity": 4,
+                    "floor": 7
                 }
             }
         ]
@@ -135,7 +157,7 @@ export default class Main extends Component {
     }
 
     componentDidMount = () => {
-      this.fetchEvents().then(events => {
+      this.fetchEvents(0).then(events => {
           let newEvents = this.handleEventData(events)
           this.setState({ events: newEvents })
       })

@@ -584,16 +584,31 @@ main.main-page {
 .right-bar .timeline .time-area .rows .room {
   position: relative;
   height: 35px;
-  background: #D5DFE9;
   margin-bottom: 22px;
+  background: #D5DFE9;
   transition: 0.2s;
+}
+
+.right-bar .timeline .time-area .rows .room.active {
+  background: #99A9B9;
+}
+
+.right-bar .timeline .time-area .rows .room .event-time {
+  width: auto;
+  height: 100%;
+  background: #D5DFE9;
+  transition: 0.2s;
+}
+
+.right-bar .timeline .time-area .rows .room .event-time.active {
+  background: #99A9B9;
 }
 
 .right-bar .timeline .time-area .rows .room:last-of-type {
   margin-bottom: 0;
 }
 
-.right-bar .timeline .time-area .rows .room > a button {
+.right-bar .timeline .time-area .rows .room a button {
   transition: 0.2s;
   width: 100%;
   min-height: 35px;
@@ -601,15 +616,17 @@ main.main-page {
   background: white !important;
   border: none;
   border-radius: 0;
+  color: transparent !important;
 }
 
-.right-bar .timeline .time-area .rows .room:hover > a button {
+.right-bar .timeline .time-area .rows .room:hover a button {
   cursor: pointer;
+  color: white;
   background: #1D54FE;
   border-radius: 2px;
 }
 
-.right-bar .timeline .time-area .rows .room:hover > a button:active {
+.right-bar .timeline .time-area .rows .room:hover a button:active {
   background: #1D00FE;
 }
 
@@ -623,10 +640,6 @@ main.main-page {
   left: 10px;
   top: 0;
   box-shadow: 0 1px 16px 0 rgba(0, 44, 92, 0.28);
-}
-
-.right-bar .timeline .time-area .rows .room.active {
-  background: #99A9B9;
 }
 
 .tooltip {
@@ -755,5 +768,16 @@ main.main-page {
 
 a {
   text-decoration: none !important;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+}
+
+.separator, .event-time {
+  min-width: 1px;
+  width: auto;
+  height: 35px;
 }
 /*# sourceMappingURL=style.css.map */

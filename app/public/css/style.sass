@@ -459,12 +459,21 @@ main.main-page
         .room
           position: relative
           height: 35px
-          background: $room-taken
           margin-bottom: 22px
+          background: $room-taken
           transition: 0.2s
+          &.active
+              background: $column-show-tooltip
+          & .event-time
+            width: auto
+            height: 100%
+            background: $room-taken
+            transition: 0.2s
+            &.active
+              background: $column-show-tooltip
           &:last-of-type
             margin-bottom: 0
-          & > a button
+          & a button
             transition: 0.2s
             width: 100%
             min-height: 35px
@@ -472,8 +481,10 @@ main.main-page
             background: white !important
             border: none
             border-radius: 0
-          &:hover > a button
+            color: transparent !important
+          &:hover a button
             cursor: pointer
+            color: white
             background: $room-hover
             border-radius: 2px
             &:active
@@ -488,8 +499,6 @@ main.main-page
             left: 10px
             top: 0
             +shadow
-          &.active
-            background: $column-show-tooltip
 
 
 
@@ -585,3 +594,11 @@ main.main-page
 
 a
   text-decoration: none !important
+
+.flex
+  +flex-vertical-center
+
+.separator, .event-time
+  min-width: 1px
+  width: auto
+  height: 35px

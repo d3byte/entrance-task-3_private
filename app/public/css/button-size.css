@@ -1,10 +1,13 @@
 .s {
+  min-width: 1px !important;
+  width: auto !important;
   padding: auto auto;
   text-align: center;
 }
 
 .s- {
-  display: none;
+  width: 0 !important;
+  margin-right: 0 !important;
 }
 
 .s-1 {
@@ -1079,5 +1082,10 @@
     width: 2px !important;
     margin-left: 118px !important;
   }
+}
+
+.event-time {
+  width: auto !important;
+  margin: 0 !important;
 }
 /*# sourceMappingURL=button-size.css.map */
