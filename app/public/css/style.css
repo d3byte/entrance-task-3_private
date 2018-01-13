@@ -589,6 +589,10 @@ main.main-page {
   transition: 0.2s;
 }
 
+.right-bar .timeline .time-area .rows .room a {
+  background: white;
+}
+
 .right-bar .timeline .time-area .rows .room.active {
   background: #99A9B9;
 }

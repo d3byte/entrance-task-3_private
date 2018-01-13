@@ -33,7 +33,7 @@ export default class Timeline extends Component {
     }
 
     // Определяю количество колонок, принадлежащих эвенту
-    determineColAmount(eventId) {
+    determineColAmount = eventId => {
         const amount = document.querySelectorAll(`.event-${eventId}`).length
         return amount
     }
@@ -321,13 +321,13 @@ export default class Timeline extends Component {
     }
 
     // Вычисляю размеры кнопки
-    createButtons = (taIndex, floorIndex, roomId, data) => {
+    createButtons = (taIndex, floorIndex, room, data) => {
         let buttons = []
         const time = data[taIndex].date.toString().slice(0, 2)
         // eslint-disable-next-line
         let events = data[taIndex].events.map(event => {
             // eslint-disable-next-line
-            if (event.floor === floorIndex && event.room.id == roomId)
+            if (event.floor === floorIndex && event.room.id == room.id)
                 return event
         })
         events = events.filter(item => item != undefined)
@@ -338,28 +338,58 @@ export default class Timeline extends Component {
                 let btnSize
                 // eslint-disable-next-line
                 if (event && time == event.hoursIncluded[0]) {
-                    btnSize = 60 - event.start.time.minutes
-                    console.log(btnSize)
+                    btnSize = 60 - parseInt(event.start.time.minutes)
                     const button = (
                         <div className="flex">
-                            <Link to="/new" style={{ width: (60 - btnSize) + 'px', display: 'block' }}>
+                            <Link 
+                                to={{ pathname: '/new', state: { 
+                                    start: {
+                                        hours: event.start.time.hours,
+                                        minutes: '00'
+                                    },
+                                    end: {
+                                        hours: event.start.time.hours,
+                                        minutes: parseInt(event.start.time.minutes) - 1
+                                    },
+                                    room
+                                }}}
+                                style={{ width: (60 - btnSize) + 'px', display: 'block' }}
+                            >
                                 <button className={'select-room s-' + btnSize}>
                                     +
-                            </button>
+                                </button>
                             </Link>
-                            <div className={`separator e-${event.id}`} style={{ width: btnSize + 'px' }}>
+                            <div
+                                onClick={e => this.createTooltip(e, event)}
+                                className={`separator e-${event.id}`} style={{ width: btnSize + 'px' }}>
                             </div>
                         </div>
                     )
                     buttons.push(button)
                     // eslint-disable-next-line
                 } else if (event && time == event.hoursIncluded.last()) {
-                    let btnSize = event.end.time.minutes + '-r'
+                    let btnSize = 60 - parseInt(event.end.time.minutes) + '-r'
                     const button = (
                         <div className="flex">
-                            <div className={`separator e-${event.id}`} style={{ width: (60 - btnSize) + 'px' }}>
+                            <div
+                                onClick={e => this.createTooltip(e, event)}
+                                className={`separator e-${event.id}`} style={{ width: (parseInt(event.end.time.minutes)) + 'px' }}>
                             </div>
-                            <Link to="/new" style={{ width: event.end.time.minutes + 'px', display: 'block' }}>
+                            <Link 
+                                to={{
+                                    pathname: '/new', state: {
+                                        start: {
+                                            hours: event.start.time.hours,
+                                            minutes: parseInt(event.end.time.minutes) + 1
+                                        },
+                                        end: {
+                                            hours: (parseInt(event.start.time.hours) + 1) == 24 ? 0 : (parseInt(event.start.time.hours) + 1),
+                                            minutes: '00'
+                                        },
+                                        room
+                                    }
+                                }}
+                                style={{ width: parseInt(60 - parseInt(event.end.time.minutes)) + 'px', display: 'block' }}>
                                 <button className={'select-room s-' + btnSize}>
                                     +
                                 </button>
@@ -370,7 +400,9 @@ export default class Timeline extends Component {
                     buttons.push(button)
                 } else if (event) {
                     const space = (
-                        <div className={`event-time e-${event.id}`}>
+                        <div
+                            onClick={e => this.createTooltip(e, event)}
+                            className={`event-time e-${event.id}`}>
                         </div>
                     )
                     buttons.push(space)
@@ -383,19 +415,33 @@ export default class Timeline extends Component {
                 if(index == 0) {
                     const separator = (
                         <div
-                            style={{ width: this.screenWidth < 1920 ? (event.end.time.minutes + 'px') : ((event.end.time.minutes * 2) + 'px') }}
+                            onClick={e => this.createTooltip(e, event)}
+                            style={{ width: this.screenWidth < 1920 ? (parseInt(event.end.time.minutes) + 'px') : ((parseInt(event.end.time.minutes) * 2) + 'px') }}
                             className={`separator e-${event.id}`}
                         ></div>
                     )
                     const link = (
                         <Link
-                            to="/new" className={'select-room s'}
-                            style={{ width: (events[index + 1].start.time.minutes - event.end.time.minutes) + 'px' }}
+                            to={{
+                                pathname: '/new', state: {
+                                    start: {
+                                        hours: event.start.time.hours,
+                                        minutes: parseInt(event.end.time.minutes) + 1
+                                    },
+                                    end: {
+                                        hours: event.start.time.hours,
+                                        minutes: parseInt(events[index + 1].start.time.minutes) - 1
+                                    },
+                                    room
+                                }
+                            }}
+                            className={'select-room s'}
+                            style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}
 
                         >
-                            <button style={{ width: (events[index + 1].start.time.minutes - event.end.time.minutes) + 'px' }}>
+                            <button style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}>
                                 +
-                        </button>
+                            </button>
                         </Link>
                     )
                     array.push(separator)
@@ -403,7 +449,8 @@ export default class Timeline extends Component {
                 }  else if (index == events.length - 1) {
                     const separator = (
                         <div
-                            style={{ width: this.screenWidth < 1920 ? ((60 - event.start.time.minutes) + 'px') : (((60 - event.start.time.minutes) * 2) + 'px') }}
+                            onClick={e => this.createTooltip(e, event)}
+                            style={{ width: this.screenWidth < 1920 ? ((60 - parseInt(event.start.time.minutes)) + 'px') : (((60 - parseInt(event.start.time.minutes)) * 2) + 'px') }}
                             className={`separator e-${event.id}`}
                         ></div>
                     )
@@ -412,19 +459,33 @@ export default class Timeline extends Component {
                 else {
                     const separator = (
                         <div
-                            style={{ width: this.screenWidth < 1920 ? ((event.end.time.minutes - event.start.time.minutes) + 'px') : (((event.end.time.minutes - event.start.time.minutes) * 2) + 'px') }}
+                            onClick={e => this.createTooltip(e, event)}
+                            style={{ width: this.screenWidth < 1920 ? ((parseInt(event.end.time.minutes) - parseInt(event.start.time.minutes)) + 'px') : (((parseInt(event.end.time.minutes) - parseInt(event.start.time.minutes)) * 2) + 'px') }}
                             className={`separator e-${event.id}`}
                         ></div>
                     )
                     const link = (
                         <Link
-                            to="/new" className={'select-room s'}
-                            style={{ width: (events[index + 1].start.time.minutes - event.end.time.minutes) + 'px' }}
+                            to={{
+                                pathname: '/new', state: {
+                                    start: {
+                                        hours: event.start.time.hours,
+                                        minutes: parseInt(event.end.time.minutes) + 1
+                                    },
+                                    end: {
+                                        hours: event.start.time.hours,
+                                        minutes: parseInt(events[index + 1].start.time.minutes) - 1
+                                    },
+                                    room
+                                }
+                            }}
+                            className={'select-room s'}
+                            style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}
 
                         >
-                            <button style={{ width: (events[index + 1].start.time.minutes - event.end.time.minutes) + 'px' }}>
+                            <button style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}>
                                 +
-                        </button>
+                            </button>
                         </Link>
                     )
                     array.push(separator)
@@ -439,7 +500,21 @@ export default class Timeline extends Component {
             buttons.push(container)
         } else {
             const button = (
-                <Link to="/new" className="button-wrapper">
+                <Link
+                    to={{
+                        pathname: '/new', state: {
+                            start: {
+                                hours: time < 10 ? ('0' + time) : time,
+                                minutes: '00'
+                            },
+                            end: {
+                                hours: (+time + 1) == 24 ? '00' : (+time + 1) < 10 ? '0' + (+time + 1).toString() : (+time + 1),
+                                minutes: '00'
+                            },
+                            room
+                        }
+                    }}
+                    className="button-wrapper">
                     <button className="select-room s-60">
                         +
                     </button>
@@ -462,17 +537,7 @@ export default class Timeline extends Component {
                             {floor.rooms.map((room, k) => (
                                 <div className={'room r-' + room.id}>
                                     <div className="scrolled-tag">{room.name}</div>
-                                    {this.createButtons(index, floor.num, room.id, data).map(btn => btn)}
-                                    {/* <Link to="/new" className="button-wrapper">
-                                        <button
-                                            className={
-                                                'select-room s-' +
-                                                this.computeButtonSize(index, floor.num, room.id, data)
-                                            }
-                                        >
-                                            +
-                                        </button>
-                                    </Link> */}
+                                    {this.createButtons(index, floor.num, room, data).map(btn => btn)}
                                 </div>
                                 )
                             )}
