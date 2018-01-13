@@ -3,6 +3,10 @@
   text-align: center;
 }
 
+.s- {
+  display: none;
+}
+
 .s-1 {
   width: 59px !important;
   margin-right: 1px !important;

@@ -1,85 +1,34 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 export default class Timeline extends Component {
     constructor() {
         super()
         this.state = {
-            events: []
+            events: [],
+            floors: [
+                {
+                    num: 7,
+                    rooms: [
+                        { id: 1, name: 'Ржавый Фред', capacity: '3-6 человек' },
+                        { id: 2, name: 'Прачечная', capacity: 'До 10 человек' },
+                        { id: 3, name: 'Жёлтый Дом', capacity: 'До 10 человек' },
+                        { id: 4, name: 'Оранжевый тюльпан', capacity: 'До 10 человек' }
+                    ]
+                },
+                {
+                    num: 6,
+                    rooms: [
+                        { id: 1, name: 'Ржавый Фред', capacity: '3-6 человек' },
+                        { id: 2, name: 'Прачечная', capacity: 'До 10 человек' },
+                        { id: 3, name: 'Жёлтый Дом', capacity: 'До 10 человек' },
+                        { id: 4, name: 'Оранжевый тюльпан', capacity: 'До 10 человек' }
+                    ]
+                },
+            ],
+            currentTime: null,
+            renderData: []
         }
-    }
-
-    fetchEvents = (ms) => {
-        const events = [
-            {
-                "id": "1",
-                "title": "ШРИ 2018 - начало",
-                "dateStart": "2017-12-28T12:16:23.309Z",
-                "dateEnd": "2017-12-28T14:57:23.309Z",
-                "users": [
-                    {
-                        "id": "1",
-                        "login": "veged"
-                    },
-                    {
-                        "id": "2",
-                        "login": "alt-j"
-                    }
-                ],
-                "room": {
-                    "id": "1",
-                    "title": "404",
-                    "capacity": 5,
-                    "floor": 7
-                }
-            },
-            {
-                "id": "2",
-                "title": "👾 Хакатон 👾",
-                "dateStart": "2017-12-28T14:57:23.309Z",
-                "dateEnd": "2017-12-28T15:57:23.309Z",
-                "users": [
-                    {
-                        "id": "2",
-                        "login": "alt-j"
-                    },
-                    {
-                        "id": "3",
-                        "login": "yeti-or"
-                    }
-                ],
-                "room": {
-                    "id": "2",
-                    "title": "Деньги",
-                    "capacity": 4,
-                    "floor": 6
-                }
-            },
-            {
-                "id": "3",
-                "title": "🍨 Пробуем kefir.js",
-                "dateStart": "2017-12-28T16:57:23.309Z",
-                "dateEnd": "2017-12-28T21:57:23.309Z",
-                "users": [
-                    {
-                        "id": "1",
-                        "login": "veged"
-                    },
-                    {
-                        "id": "3",
-                        "login": "yeti-or"
-                    }
-                ],
-                "room": {
-                    "id": "3",
-                    "title": "Карты",
-                    "capacity": 4,
-                    "floor": 7
-                }
-            }
-        ]
-        return new Promise((resolve, reject) => {
-            setTimeout(() => resolve(events), ms)
-        })
     }
 
     // Определяю текущее время
@@ -97,60 +46,13 @@ export default class Timeline extends Component {
         }
     }
 
-    // Функция для преобразования данных типа Date в удобный мне формат
-    splitDate = date => {
-        return {
-            year: date.slice(0, 4),
-            month: date.slice(5, 7),
-            day: date.slice(8, 10),
-            time: {
-                hours: date.slice(11, 13),
-                minutes: date.slice(14, 16),
-                seconds: date.slice(17, 19),
-            },
-        }
-    }
-
-    // Функция для высчитывания часов, затронутых эвентом
-    hoursIncluded = (start, end) => {
-        let hours = []
-        for (var i = start; i <= end; i++) {
-            // eslint-disable-next-line
-            hours.push(parseInt(i))
-        }
-        return hours
-    }
-
-    // Обрабатываю полученные с сервера данные об эвентах
-    handleEventData = data => {
-        let newData = data.map(event => {
-            return {
-                id: event.id,
-                title: event.title,
-                floor: event.room.floor,
-                room: {
-                    id: event.room.id,
-                    title: event.room.title,
-                    capacity: event.room.capacity,
-                    users: event.users
-                },
-                start: this.splitDate(event.dateStart),
-                end: this.splitDate(event.dateEnd),
-                hoursIncluded: this.hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
-            }
-        })
-        return newData
-    }
-
     // Совмещаю уже обработанные данные об эвентах со временем так, чтобы было удобно рендерить таблицу
     computeDataToRender = (currentTime, events) => {
         let data = []
 
-        const handledData = this.handleEventData(events)
-
         for (let i = currentTime.hours - 3; i <= currentTime.hours; i++) {
             // eslint-disable-next-line
-            let eventInfo = handledData.map(date => {
+            let eventInfo = events.map(date => {
                 if (date.hoursIncluded.includes(i))
                     return date
             })
@@ -162,7 +64,7 @@ export default class Timeline extends Component {
                 continue
             }
             if (i < 0) {
-                var correctHour = 24 - Math.abs(i)
+                let correctHour = 24 - Math.abs(i)
                 data.push({
                     date: correctHour,
                     events: eventInfo.filter(event => event !== undefined)
@@ -177,7 +79,7 @@ export default class Timeline extends Component {
 
         for (let i = currentTime.hours + 1; i < 24; i++) {
             // eslint-disable-next-line
-            let eventInfo = handledData.map(date => {
+            let eventInfo = events.map(date => {
                 if (date.hoursIncluded.includes(i))
                     return date
             })
@@ -188,7 +90,7 @@ export default class Timeline extends Component {
         }
         for (let i = 0; i < data[0].date; i++) {
             // eslint-disable-next-line
-            let eventInfo = handledData.map(date => {
+            let eventInfo = events.map(date => {
                 if (date.hoursIncluded.includes(i))
                     return date
             })
@@ -278,19 +180,114 @@ export default class Timeline extends Component {
         head.appendChild(style)
     }
 
-    componentDidMount = () => {
-      this.fetchEvents().then(events => {
-          events = this.handleEventData(events)
-          this.setState({ events })
-      })
-      console.log(this.state.events)
+    // Вычисляю размеры кнопки
+    computeButtonSize = (taIndex, floorIndex, roomId, data) => {
+        let btnSize = 60
+        const time = data[taIndex].date.toString().slice(0, 2)
+        // eslint-disable-next-line
+        const events = data[taIndex].events.map(event => {
+            // eslint-disable-next-line
+            if (event.floor === floorIndex && event.room.id == roomId)
+                return event
+        })
+        // eslint-disable-next-line
+        events.map((event, index) => {
+            // eslint-disable-next-line
+            if (event && time == event.hoursIncluded[0]) {
+                btnSize -= event.start.time.minutes
+                // eslint-disable-next-line
+            } else if (event && time == event.hoursIncluded.last()) {
+                btnSize = event.end.time.minutes + '-r'
+                // if (index === events.length - 1) {
+                // btnSize += '-r
+                //}
+            } else if (!event) {
+                return btnSize
+            } else {
+                btnSize = ''
+            }
+        })
+        return btnSize
     }
+
+    // Готовлю таблицу с эвентами
+    getTimelines = (data, currentTime) => {
+        // eslint-disable-next-line
+        const render = data.map((item, index) => {
+            const floors = this.state.floors.map((floor, key) => {
+                const floorJSX = (
+                    <div key={key} className={'floor f-' + floor.num}>
+                        <span className="floor-num">{floor.num} этаж</span>
+                        <div className="rows">
+                            {floor.rooms.map((room, k) => (
+                                <div className={'room r-' + room.id}>
+                                    <div className="scrolled-tag">{room.name}</div>
+                                    <Link to="/new" className="button-wrapper">
+                                        <button
+                                            className={
+                                                'select-room s-' +
+                                                this.computeButtonSize(index, floor.num, room.id, data)
+                                            }
+                                        >
+                                            +
+                                        </button>
+                                    </Link>
+                                </div>
+                                )
+                            )}
+                        </div>
+                    </div>
+                )
+                return floorJSX
+            })
+
+            // eslint-disable-next-line
+            const timeArea = (
+                // eslint-disable-next-line
+                <div className={`time-area ta-${index} ${item.date == currentTime.time ? 'current' : ''}`}>
+                    <div class="timing">
+                        {
+                            // eslint-disable-next-line
+                            item.date == currentTime.time && 
+                            <span class="hours">{currentTime.hours}</span>
+                        }
+                        <span>{item.date}</span>
+                    </div>
+                    <div class="floors">
+                        {floors}
+                    </div>
+                </div>
+            )
+            return timeArea
+        })
+
+        return render
+    }
+
+    componentDidMount = () => {
+        // eslint-disable-next-line
+        Array.prototype.last = function () {
+            return this[this.length - 1]
+        }
+    }
+
+    componentWillReceiveProps = props => {
+        const currentTime = this.determineTime()
+        this.addStyle(currentTime)
+        this.setState({
+            currentTime,
+            renderData: this.computeDataToRender(currentTime, props.events)
+        })
+    }
+    
     
 
     render = () => {
         return (
         <div className="timeline">
-            
+            {
+                this.getTimelines(this.state.renderData, this.state.currentTime).map(ta => ta)
+            }
         </div>
         )
     }
