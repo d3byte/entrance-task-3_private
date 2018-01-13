@@ -116,24 +116,25 @@
     padding: 0 0 0 0 !important;
   }
   .floor-container .floor-num {
-    padding: 16px 0 4px 25px;
+    padding: 22px 0 4px 25px;
+    height: 51px;
     background: #f7f8f9;
     font-weight: bold;
   }
   .right-bar .timeline .time-area .floor {
-    margin-bottom: 44px;
+    margin-bottom: 51px;
   }
   .right-bar .timeline .time-area .floor:last-of-type {
     margin-bottom: 0 !important;
   }
   .right-bar .timeline .time-area .timing + .floors .floor:first-of-type .room:first-of-type {
-    margin-top: 44px;
+    margin-top: 0;
   }
   .right-bar .timeline .time-area .rows .room,
   .right-bar .timeline .time-area .rows .room button,
   .left-bar .floor-container ul.rooms li.room {
     box-sizing: border-box !important;
-    height: 58px;
+    height: 60px;
     border-bottom: 1px solid #E9ECEF !important;
     margin: 0;
   }
@@ -141,7 +142,9 @@
     width: 100% !important;
   }
   .left-bar .floor-container ul.rooms li.room {
+    box-sizing: border-box !important;
     padding: 8px 0 8px 25px !important;
+    height: 60px !important;
     width: 100% !important;
     z-index: 1000;
   }
@@ -153,6 +156,9 @@
   }
   .right-bar.scrolled {
     width: 100%;
+  }
+  .right-bar.scrolled .timeline .time-area .floor .room {
+    height: 56px !important;
   }
   .right-bar.scrolled .timeline .time-area .floor .room .scrolled-tag {
     display: block;
