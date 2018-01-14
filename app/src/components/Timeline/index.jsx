@@ -48,7 +48,6 @@ export default class Timeline extends Component {
         const rowsContainer = roomContainer.parentElement
         const floorContainer = rowsContainer.parentElement
         const floorId = floorContainer.classList[1].slice(2)
-        console.log(floorId, roomContainer)
         let room = document.querySelector(`.floor-container.f-${floorId} .rooms .room.r-${roomId}`)
         if (room && !room.classList.contains('disabled')) {
             room.classList.add('active')
@@ -360,7 +359,6 @@ export default class Timeline extends Component {
         events = events.filter(item => item != undefined)
         // eslint-disable-next-line
         if (events.length == 1) {
-            // console.log(events)
             events.map((event, index) => {
                 let btnSize
                 // eslint-disable-next-line
@@ -607,11 +605,24 @@ export default class Timeline extends Component {
         return render
     }
 
+    filterEvents = e => {
+        const currentTime = this.determineTime()
+        let newEvents = this.state.events.map(event => {
+            const month = event.start.month,
+                day = event.start.day
+            if (month == (e.detail.month + 1) && day == e.detail.day)
+                return event
+        }).filter(item => item !== undefined)
+        this.setState({ renderData: this.computeDataToRender(currentTime, newEvents), })
+    }
+
     componentDidMount = () => {
         // eslint-disable-next-line
         Array.prototype.last = function () {
             return this[this.length - 1]
         }
+
+        document.addEventListener('filter-events', this.filterEvents)
     }
 
     componentWillReceiveProps = props => {
@@ -619,8 +630,10 @@ export default class Timeline extends Component {
         this.addStyle(currentTime)
         this.setState({
             currentTime,
-            renderData: this.computeDataToRender(currentTime, props.events)
+            renderData: this.computeDataToRender(currentTime, props.events),
+            events: props.events
         })
+        this.filterEvents(props.events, currentTime)
     }
 
     render = () => {

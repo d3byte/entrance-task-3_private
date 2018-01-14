@@ -8,7 +8,8 @@ export default class Calendar extends Component {
             monthIndex: 2,
             h5: new Date().getDate() + '&#183; Сегодня',
             hide: true,
-            months: []
+            months: [],
+            currentDay: {}
         }
 
         this.dayChanged = new Event('day-changed')
@@ -64,6 +65,7 @@ export default class Calendar extends Component {
 
         return {
             name: name,
+            index: month,
             days: days.filter(week => week.length !== 0)
         }
     }
@@ -86,27 +88,38 @@ export default class Calendar extends Component {
             h5 = `${day} ${monthName}`
         }
 
+        const time = {
+            day,
+            month: this.getMonthIndex(month.name)
+        }
+
+        const update = new CustomEvent('filter-events', { detail: time })
+        document.dispatchEvent(update)
+
         this.setState({
-            currentDay: month.days[indexOfWeek][indexOfDay],
             monthIndex: indexOfMonth,
             h5
         })
 
-        document.querySelector('.left-bar .date h5').innerHTML = h5
-        document.querySelector('header .date h5').innerHTML = h5
+        let leftbarDate = document.querySelector('.left-bar .date h5'),
+            headerDate = document.querySelector('header .date h5')
 
+        if (leftbarDate)
+            leftbarDate.innerHTML = h5
+        if (headerDate)
+            headerDate.innerHTML = h5
 
         // Меняю активную клетку таблицы
         let today = document.querySelector('td.today')
         if (today)
-            today.classList.remove('today')
+            today.classList.remove('active')
         let newToday = document.querySelector(`
             .month:nth-of-type(${indexOfMonth})
             tr:nth-of-type(${indexOfWeek + 1})
             td:nth-of-type(${indexOfDay + 1})
         `)
         if (newToday)
-            newToday.classList.add('today')
+            newToday.classList.add('active')
     }
 
     chooseDay = ({ indexOfWeek, indexOfDay, indexOfMonth, month }) => {
@@ -131,7 +144,7 @@ export default class Calendar extends Component {
             <td
                 key={i}
                 onClick={() => !editor ? this.changeDay(info) : this.chooseDay(info)}
-                className={'td ' + current && day === new Date().getDate() ? 'today' : ''}
+                className="td"
             >
                 {day}
             </td>
@@ -296,21 +309,26 @@ export default class Calendar extends Component {
             previousMonth = this.getMonthInfo(date.getMonth() - 1, year),
             nextMonth = this.getMonthInfo(date.getMonth() + 1, year)
 
-        const months = [
-            this.createMonth(previousMonth, false, 1),
-            this.createMonth(currentMonth, true, 2),
-            this.createMonth(nextMonth, false, 3)
-        ]
-
-        this.setState({ months })
-
         const text = `${day} ${monthName} &#183; Сегодня`
 
-        this.setState({ h5: text })
+        this.setState({
+            h5: text, 
+            currentDay: {
+                day,
+                month: date.getMonth()
+            }
+        }, () => {
+            const months = [
+                this.createMonth(previousMonth, false, 1),
+                this.createMonth(currentMonth, true, 2),
+                this.createMonth(nextMonth, false, 3)
+            ]
+
+            this.setState({ months })
+        })
 
         if (this.screenWidth <= 768) {
         document.addEventListener('header-rendered', () => {
-            console.log('header-rendered event fired')
             document.querySelector('header .date h5').innerHTML = text
             const toggle = new Event('toggle-header-calendar')
             document.dispatchEvent(toggle)
