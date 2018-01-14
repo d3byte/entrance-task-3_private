@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 import Header from '../../components/Header'
 import Calendar from '../../components/Calendar'
@@ -7,14 +8,12 @@ import close from '../../assets/img/close.svg'
 import calendar from '../../assets/img/calendar.svg'
 import closeWhite from '../../assets/img/close-white.svg'
 
-
-
 export default class New extends Component {
     constructor() {
         super()
         this.state = {
-            start: '16:00',
-            end: '16:30',
+            start: '',
+            end: '',
             date: '',
             dateInput: '',
             rooms: [
@@ -52,7 +51,7 @@ export default class New extends Component {
     setTodayDate = () => {
         let date = new Date(),
             day = date.getDate(),
-            month = this.monthNumToText(date.getMonth()),
+            month = date.getMonth(),
             year = date.getFullYear()
 
         if (month === -1) {
@@ -63,9 +62,12 @@ export default class New extends Component {
             month = 0
         }
         
-        const text = `${day} ${month}, ${year}`
+        const dateInput = `${day} ${this.monthNumToText(month)}, ${year}`
 
-        this.setState({ dateInput: text })
+        this.setState({
+            date: `${year}-${month}-${day}`,
+            dateInput
+        })
     }
 
     handleThemeInput = e => {
@@ -113,7 +115,6 @@ export default class New extends Component {
     }
 
     chooseRoom = room => {
-        // console.log(room)
         this.setState({ room })
     }
 
@@ -181,6 +182,30 @@ export default class New extends Component {
         }
     }
 
+    reset = () => {
+        let invitedUsers = this.state.invitedUsers.slice(0)
+        let users = this.state.users.slice(0)
+        users = users.concat(invitedUsers)
+        this.setState({ 
+            start: '', end: '', date: '', users, 
+            invitedUsers: [], showUsers: '', theme: '',
+            room: null, error_end: false, error_start: false
+        })
+        this.setTodayDate()
+    }
+
+    submit = () => {
+        localStorage.setItem('success', 'true')
+        localStorage.setItem(
+            'info', 
+            JSON.stringify({ 
+                date: this.state.dateInput.slice(0, this.state.dateInput.length - 5) + ' ' + this.state.start + '–' + this.state.end,
+                room: this.state.room
+            })
+        )
+        this.props.history.push('/')
+    }
+
     componentDidMount = () => {
         if(this.props && this.props.location)
             this.setPropsInfo(this.props.location.state)
@@ -189,7 +214,7 @@ export default class New extends Component {
     }
 
     componentWillUnmount = () => {
-        document.removeEventListener('new-date')
+        document.removeEventListener('new-date', this.handleDateInput)
     }
     
     
@@ -204,7 +229,7 @@ export default class New extends Component {
                         <div className="row space-between">
                             <h4>Новая встреча</h4>
                             <div className="icon-container hide-mobile">
-                                <img src={close} alt="close-icon" />
+                                <img src={close} alt="close-icon" onClick={this.reset} />
                             </div>
                         </div>
 
@@ -212,7 +237,7 @@ export default class New extends Component {
                             <div className="row-col">
                                 <div className="labeled-input">
                                     <label>Тема</label>
-                                    <input onInput={this.handleThemeInput} type="text" placeholder="О чём будете говорить?" />
+                                    <input onChange={this.handleThemeInput} value={this.state.theme} type="text" placeholder="О чём будете говорить?" />
                                 </div>
                             </div>
 
@@ -328,14 +353,28 @@ export default class New extends Component {
                 </main>
             </div>
             <footer>
-                <div className="hide-desktop">
-                    Выберите переговорку
-                </div>
+                {
+                    this.state.invitedUsers.length > 0 && this.state.theme.length > 0 &&
+                    this.state.room !== null && this.state.date.length > 0 &&
+                    this.state.start.length === 5 && this.state.end.length === 5 &&
+                    !this.state.error_end && !this.state.error_start && (
+                        <div className="hide-desktop">
+                            Выберите переговорку
+                        </div>
+                    )
+                }
                 <div className="btns">
-                    <a href="main.html" className="button-wrapper hide-mobile">
+                    <Link to="/" className="button-wrapper hide-mobile">
                         <button className="button">Отмена</button>
-                    </a>
-                    <button className="button create"  disabled>Создать встречу</button>
+                    </Link>
+                    <button 
+                        className="button create" onClick={this.submit}
+                        disabled={
+                            this.state.invitedUsers.length > 0 && this.state.theme.length > 0 &&
+                            this.state.room !== null && this.state.date.length > 0 &&
+                            this.state.start.length === 5 && this.state.end.length === 5 &&
+                            !this.state.error_end && !this.state.error_start ? false : true
+                    }>Создать встречу</button>
                 </div>
             </footer>
         </div>

@@ -182,7 +182,35 @@ export default class Main extends Component {
         }
     }
 
+    showModal = () => {
+        let modalOverlay = document.createElement('div')
+        modalOverlay.classList.add('overlay')
+        modalOverlay.setAttribute('id', 'modal-overlay')
+        document.body.insertBefore(modalOverlay, document.getElementById('root'))
+        document.getElementById('created-meeting').classList.remove('hide')
+        let modal = document.querySelector('.modal')
+        modal.classList.add('open')
+        modal.style.top = '25%'
+        document.addEventListener('click', this.hideModal)
+    }
+
+    hideModal = e => {
+        if(!e.target.classList.contains('md')) {
+            const overlay = document.querySelector('#modal-overlay')
+            if(overlay)
+                overlay.remove()
+            document.getElementById('created-meeting').classList.add('hide')
+            document.querySelector('.modal').classList.remove('open')
+            localStorage.removeItem('info')
+            localStorage.removeItem('success')
+        }
+    }
+
     componentDidMount = () => {
+        if (localStorage.success == 'true') {
+            this.showModal()
+        }
+            
         this.fetchEvents(0).then(events => {
             let newEvents = this.handleEventData(events)
             this.setState({ events: newEvents })
@@ -191,6 +219,12 @@ export default class Main extends Component {
 
     render() {
         const { location } = this.props
+        let info
+        console.log(localStorage.info)
+        if(localStorage.info) {
+            info = JSON.parse(localStorage.info)
+            console.log(info)
+        }
         return (
         <div>
             <Header path={location.pathname} />
@@ -211,23 +245,27 @@ export default class Main extends Component {
                     )
                 }
             </main>
-            <div id="created-meeting" class="modal-box hide">
-                <div class="modal">
-                    <div class="modal-body">
-                        <div class="col centered">
-                            <img src={emoji2} alt="emogi"/>
-                            <h4>Встреча создана!</h4>
-                            <p class="text-center">
-                                14 декабря, 15:00–17:00 <br/>
-                                Готем &#183; 4 этаж
-                            </p>
-                        </div>
-                        <div class="row centered">
-                            <button class="button blue" data-action="modal-close">Хорошо</button>
+            {
+                localStorage.getItem('info') !== null && (
+                    <div id="created-meeting" className="modal-box hide">
+                        <div className="modal md">
+                            <div className="modal-body md">
+                                <div className="col centered md">
+                                    <img src={emoji2} alt="emogi" className="md" />
+                                    <h4 className="md">Встреча создана!</h4>
+                                    <p className="text-cente md">
+                                        {info.date} <br />
+                                        {info.room.title} &#183; {info.room.floor} этаж
+                                    </p>
+                                </div>
+                                <div className="row centered md">
+                                    <button className="button blue" data-action="modal-close" onClick={this.hideModal}>Хорошо</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                )
+            }
         </div>
         )
     }
