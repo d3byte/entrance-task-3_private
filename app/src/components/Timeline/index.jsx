@@ -139,43 +139,57 @@ export default class Timeline extends Component {
         }
     }
 
+    goTo = (e, event) => {
+        if (e.target.classList.contains('clickme') || e.target.parentElement.classList.contains('clickme')) {
+            this.props.history.push({ pathname: '/edit', state: {
+                ...event
+            }})
+        }
+    }
+
     // Основная функция, создающая тултип
     createTooltip = (e, event) => {
-        this.removePreviousTooltip()
-        let tooltip = document.createElement('div')
-        tooltip.classList.add('tooltip')
-        this.highlightEventCols(event.id)
-        this.positionArrow(e)
-        this.checkForContentOverlay(e, tooltip)
-        tooltip.innerHTML = `
-        <div class="header">
-            <span class="title">${event.title}</span>
-            <div class="icon-container">
-                <img src="${edit}">
+        document.removeEventListener('click', e => this.goTo(e, event))
+        if(e.target.classList.contains(`e-${event.id}`)) {
+            this.removePreviousTooltip()
+            let tooltip = document.createElement('div')
+            tooltip.classList.add('tooltip')
+            this.highlightEventCols(event.id)
+            this.positionArrow(e)
+            this.checkForContentOverlay(e, tooltip)
+            tooltip.innerHTML = `
+            <div class="header">
+                <span class="title">${event.title}</span>
+            `
+            let editC = document.createElement('div')
+            editC.classList.add('icon-container', 'clickme')
+            document.addEventListener('click', e => this.goTo(e, event))
+            editC.innerHTML = `<img src="${edit}">`
+            tooltip.children[0].appendChild(editC)
+            tooltip.innerHTML += `
+            <div class="time">
+                <span>
+                    ${event.start.day} ${this.monthNumToText(event.start.month)},
+                    ${event.start.time.hours}:${event.start.time.minutes}–${event.end.time.hours}:${event.end.time.minutes}
+                </span>
+                <span class="dot">&#183;</span>
+                <span>
+                    ${event.room.title}
+                </span>
             </div>
-        </div>
-        <div class="time">
-            <span>
-                ${event.start.day} ${this.monthNumToText(event.start.month)},
-                ${event.start.time.hours}:${event.start.time.minutes}–${event.end.time.hours}:${event.end.time.minutes}
-            </span>
-            <span class="dot">&#183;</span>
-            <span>
-                ${event.room.title}
-            </span>
-        </div>
-        <div class="participants">
-            <div class="avatar">
-                <img src="${close}">
+            <div class="participants">
+                <div class="avatar">
+                    <img src="${close}">
+                </div>
+                <span class="name">${event.users[0].login}</span>
+                <span class="left">и ${event.users.length - 1} участников</span> 
             </div>
-            <span class="name">${event.users[0].login}</span>
-            <span class="left">и ${event.users.length - 1} участников</span> 
-        </div>
-        `
-        if (this.screenWidth <= 768) {
-            tooltip.style.width = this.screenWidth
+            `
+            if (this.screenWidth <= 768) {
+                tooltip.style.width = this.screenWidth
+            }
+            e.target.appendChild(tooltip)
         }
-        e.target.appendChild(tooltip)
     }
 
     // Определяю текущее время
@@ -652,7 +666,6 @@ export default class Timeline extends Component {
             if (e && e.detail && month == (e.detail.month + 1) && day == e.detail.day)
                 return event
         }).filter(item => item !== undefined)
-        console.log(newEvents)
         this.setState({ renderData: this.computeDataToRender(currentTime, newEvents), })
     }
 
@@ -666,7 +679,6 @@ export default class Timeline extends Component {
     }
 
     componentWillReceiveProps = props => {
-        console.log(props)
         const currentTime = this.determineTime()
         this.addStyle(currentTime)
         this.setState({
