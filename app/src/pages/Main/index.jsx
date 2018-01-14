@@ -10,7 +10,7 @@ export default class Main extends Component {
     constructor() {
         super()
         this.state = {
-            data: ['room', 'room'],
+            floors: [{ num: 7 }, { num: 6 }],
             events: [],
             rooms: [],
             scrolled: false
@@ -173,13 +173,6 @@ export default class Main extends Component {
         return newData
     }
 
-    componentDidMount = () => {
-        this.fetchEvents(0).then(events => {
-            let newEvents = this.handleEventData(events)
-            this.setState({ events: newEvents })
-        })
-    }
-
     handleScroll = e => {
         // let scroll = e.currentTarget.scrollLeft
         if (e.currentTarget.scrollLeft >= 50 && !this.state.scrolled) {
@@ -188,7 +181,13 @@ export default class Main extends Component {
             this.setState({ scrolled: false })
         }
     }
-    
+
+    componentDidMount = () => {
+        this.fetchEvents(0).then(events => {
+            let newEvents = this.handleEventData(events)
+            this.setState({ events: newEvents })
+        })
+    }
 
     render() {
         const { location } = this.props
@@ -197,7 +196,7 @@ export default class Main extends Component {
             <Header path={location.pathname} />
             <main className="main-page">
                 {   !this.state.scrolled ? 
-                    <Leftbar path={location.pathname} data={this.state.data}/> :
+                    <Leftbar path={location.pathname} data={this.state.floors}/> :
                         <div className="hide"><Leftbar path={location.pathname} data={this.state.data} /></div>
                 }
                 {

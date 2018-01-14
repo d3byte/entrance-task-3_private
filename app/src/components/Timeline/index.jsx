@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import { Link } from 'react-router-dom'
 
 import edit from '../../assets/img/edit.svg'
@@ -34,6 +35,32 @@ export default class Timeline extends Component {
             active: null
         }
         this.screenWidth = window.screen.innerWidth || document.clientWidth || document.body.clientWidth
+    }
+
+    // Добавить подсветку комнаты
+    highlightRoom = e => {
+        let roomContainer = e.target.parentElement.parentElement
+        if (roomContainer.classList.contains('flex')) {
+            roomContainer = roomContainer.parentElement
+        }
+        
+        const roomId = roomContainer.classList[1].slice(2)
+        const rowsContainer = roomContainer.parentElement
+        const floorContainer = rowsContainer.parentElement
+        const floorId = floorContainer.classList[1].slice(2)
+        console.log(floorId, roomContainer)
+        let room = document.querySelector(`.floor-container.f-${floorId} .rooms .room.r-${roomId}`)
+        if (room && !room.classList.contains('disabled')) {
+            room.classList.add('active')
+        }
+    }
+
+    // Убрать подсветку комнаты
+    stopHighlighting = e => {
+        let activeFloor = document.querySelector('.floor-container .room.active')
+        if (activeFloor) {
+            activeFloor.classList.remove('active')
+        }
     }
 
     // Позиционирую стрелочку тултипа
@@ -353,6 +380,8 @@ export default class Timeline extends Component {
                                     },
                                     room
                                 }}}
+                                onMouseOver={this.highlightRoom}
+                                onMouseOut={this.stopHighlighting}
                                 style={{ width: (60 - btnSize) + 'px', display: 'block' }}
                             >
                                 <button className={'select-room s-' + btnSize}>
@@ -389,6 +418,8 @@ export default class Timeline extends Component {
                                         room
                                     }
                                 }}
+                                onMouseOver={this.highlightRoom}
+                                onMouseOut={this.stopHighlighting}
                                 style={{ width: parseInt(60 - parseInt(event.end.time.minutes)) + 'px', display: 'block' }}>
                                 <button className={'select-room s-' + btnSize}>
                                     +
@@ -435,6 +466,8 @@ export default class Timeline extends Component {
                                     room
                                 }
                             }}
+                            onMouseOver={this.highlightRoom}
+                            onMouseOut={this.stopHighlighting}
                             className={'select-room s'}
                             style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}
 
@@ -479,6 +512,8 @@ export default class Timeline extends Component {
                                     room
                                 }
                             }}
+                            onMouseOver={this.highlightRoom}
+                            onMouseOut={this.stopHighlighting}
                             className={'select-room s'}
                             style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}
 
@@ -514,6 +549,8 @@ export default class Timeline extends Component {
                             room
                         }
                     }}
+                    onMouseOver={this.highlightRoom}
+                            onMouseOut={this.stopHighlighting}
                     className="button-wrapper">
                     <button className="select-room s-60">
                         +
@@ -585,8 +622,6 @@ export default class Timeline extends Component {
             renderData: this.computeDataToRender(currentTime, props.events)
         })
     }
-    
-    
 
     render = () => {
         return (

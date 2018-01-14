@@ -13,7 +13,7 @@ export default class Floors extends Component {
         ]
         return (
             <div>
-                {data && data.map((item, key) => <Floor key={key} floor={7} rooms={rooms} />)}
+                {data && data.map((item, key) => <Floor key={key} floor={item.num} rooms={rooms} />)}
             </div>
         )
     }
