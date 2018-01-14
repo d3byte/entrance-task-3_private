@@ -265,7 +265,7 @@ export default class Calendar extends Component {
             clickedPlace = e.explicitOriginalTarget
         } else if (this.screenWidth <= 768 && e.type === 'click'){
             clickedDate = e.target
-            document.querySelector('body .container').removeEventListener('click')
+            document.querySelector('body .container').removeEventListener('click', e => this.hideMeetingCalendar(e))
         }
 
         let activeDate = document.querySelector('td.today')
