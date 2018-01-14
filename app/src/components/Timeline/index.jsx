@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
 import { Link } from 'react-router-dom'
 
 import edit from '../../assets/img/edit.svg'
@@ -66,6 +65,7 @@ export default class Timeline extends Component {
     positionArrow = (e, offset) => {
         let width, css
         if(!offset) {
+            // eslint-disable-next-line
             width = parseInt(window.getComputedStyle(e.target).getPropertyValue('width'))
             css = `
             .tooltip:before {
@@ -73,6 +73,7 @@ export default class Timeline extends Component {
             }
             `
         } else {
+            // eslint-disable-next-line
             width = parseInt(window.getComputedStyle(e.e.target).getPropertyValue('width'))
             css = `
             .tooltip:before {
@@ -115,8 +116,11 @@ export default class Timeline extends Component {
         if (this.screenWidth - e.clientX < 340) {
             const difference = Math.abs(340 - (this.screenWidth - e.clientX))
             tooltip.style.left = '-' + difference + 'px'
+            // eslint-disable-next-line
             this.positionArrow({e, difference}, true)
+            // eslint-disable-next-line
         } else if (e.clientX - parseInt(leftBarWidth) < 30) {
+            // eslint-disable-next-line
             const difference = Math.abs(35 - (e.clientX - parseInt(leftBarWidth)))
             tooltip.style.left = + difference + 'px'
             this.positionArrow({ e, difference }, true)
@@ -326,21 +330,29 @@ export default class Timeline extends Component {
     sortEvents = events => {
         let firstEvent = events[0],
             lastEvent = events[0]
+        // eslint-disable-next-line
         events.map(event => {
             if (event.hoursIncluded[0] < firstEvent.hoursIncluded[0]) 
                 firstEvent = event
             if (event.hoursIncluded.last() > lastEvent.hoursIncluded.last())
                 lastEvent = event
         })
+        // eslint-disable-next-line
         let newEvents = events.filter(item => item != firstEvent && item != lastEvent)
+        // eslint-disable-next-line
         newEvents.sort((a, b) => {
+            // eslint-disable-next-line
             if (parseInt(a.end.hours) == parseInt(b.start.hours)) {
                 return -1
+                // eslint-disable-next-line
             } else if (parseInt(b.end.hours) == parseInt(a.start.hours)) {
                 return 1
             }
         })
+        // eslint-disable-next-line
         newEvents = [firstEvent, ...newEvents, lastEvent]
+        
+        // eslint-disable-next-line
         if(newEvents[0] == newEvents[newEvents.length - 1])
             newEvents.pop()
         return newEvents
@@ -356,13 +368,14 @@ export default class Timeline extends Component {
             if (event.floor === floorIndex && event.room.id == room.id)
                 return event
         })
-        events = events.filter(item => item != undefined)
-        // eslint-disable-next-line
-        if (events.length == 1) {
+        events = events.filter(item => item !== undefined)
+        if (events.length === 1) {
+            // eslint-disable-next-line
             events.map((event, index) => {
                 let btnSize
                 // eslint-disable-next-line
                 if (event && time == event.hoursIncluded[0]) {
+                    // eslint-disable-next-line
                     btnSize = 60 - parseInt(event.start.time.minutes)
                     const button = (
                         <div className="flex">
@@ -374,6 +387,7 @@ export default class Timeline extends Component {
                                     },
                                     end: {
                                         hours: event.start.time.hours,
+                                        // eslint-disable-next-line
                                         minutes: parseInt(event.start.time.minutes) - 1
                                     },
                                     room
@@ -393,13 +407,15 @@ export default class Timeline extends Component {
                         </div>
                     )
                     buttons.push(button)
-                    // eslint-disable-next-line
+                // eslint-disable-next-line
                 } else if (event && time == event.hoursIncluded.last()) {
+                    // eslint-disable-next-line
                     let btnSize = 60 - parseInt(event.end.time.minutes) + '-r'
                     const button = (
                         <div className="flex">
                             <div
                                 onClick={e => this.createTooltip(e, event)}
+                                // eslint-disable-next-line
                                 className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`} style={{ width: (parseInt(event.end.time.minutes)) + 'px' }}>
                             </div>
                             <Link 
@@ -407,9 +423,11 @@ export default class Timeline extends Component {
                                     pathname: '/new', state: {
                                         start: {
                                             hours: event.start.time.hours,
+                                            // eslint-disable-next-line
                                             minutes: parseInt(event.end.time.minutes) + 1
                                         },
                                         end: {
+                                            // eslint-disable-next-line
                                             hours: (parseInt(event.start.time.hours) + 1) == 24 ? 0 : (parseInt(event.start.time.hours) + 1),
                                             minutes: '00'
                                         },
@@ -418,6 +436,7 @@ export default class Timeline extends Component {
                                 }}
                                 onMouseOver={this.highlightRoom}
                                 onMouseOut={this.stopHighlighting}
+                                // eslint-disable-next-line
                                 style={{ width: parseInt(60 - parseInt(event.end.time.minutes)) + 'px', display: 'block' }}>
                                 <button className={'select-room s-' + btnSize}>
                                     +
@@ -431,6 +450,7 @@ export default class Timeline extends Component {
                     const space = (
                         <div
                             onClick={e => this.createTooltip(e, event)}
+                            // eslint-disable-next-line
                             className={`separator e-${event.id} ${this.state.active === event.id ? 'active' : ''}`}>
                         </div>
                     )
@@ -440,11 +460,13 @@ export default class Timeline extends Component {
         } else if (events.length > 1) {
             events = this.sortEvents(events)
             let array = []
+            // eslint-disable-next-line
             events.map((event, index) => {
-                if(index == 0) {
+                if(index === 0) {
                     const separator = (
                         <div
                             onClick={e => this.createTooltip(e, event)}
+                            // eslint-disable-next-line
                             style={{ width: this.screenWidth < 1920 ? (parseInt(event.end.time.minutes) + 'px') : ((parseInt(event.end.time.minutes) * 2) + 'px') }}
                             className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`}
                         ></div>
@@ -455,10 +477,12 @@ export default class Timeline extends Component {
                                 pathname: '/new', state: {
                                     start: {
                                         hours: event.start.time.hours,
+                                        // eslint-disable-next-line
                                         minutes: parseInt(event.end.time.minutes) + 1
                                     },
                                     end: {
                                         hours: event.start.time.hours,
+                                        // eslint-disable-next-line
                                         minutes: parseInt(events[index + 1].start.time.minutes) - 1
                                     },
                                     room
@@ -467,20 +491,24 @@ export default class Timeline extends Component {
                             onMouseOver={this.highlightRoom}
                             onMouseOut={this.stopHighlighting}
                             className={'select-room s'}
+                            // eslint-disable-next-line
                             style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}
 
                         >
-                            <button style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}>
+                            <button
+                                // eslint-disable-next-line
+                                style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}>
                                 +
                             </button>
                         </Link>
                     )
                     array.push(separator)
                     array.push(link)
-                }  else if (index == events.length - 1) {
+                }  else if (index === events.length - 1) {
                     const separator = (
                         <div
                             onClick={e => this.createTooltip(e, event)}
+                            // eslint-disable-next-line
                             style={{ width: this.screenWidth < 1920 ? ((60 - parseInt(event.start.time.minutes)) + 'px') : (((60 - parseInt(event.start.time.minutes)) * 2) + 'px') }}
                             className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`}
                         ></div>
@@ -491,6 +519,7 @@ export default class Timeline extends Component {
                     const separator = (
                         <div
                             onClick={e => this.createTooltip(e, event)}
+                            // eslint-disable-next-line
                             style={{ width: this.screenWidth < 1920 ? ((parseInt(event.end.time.minutes) - parseInt(event.start.time.minutes)) + 'px') : (((parseInt(event.end.time.minutes) - parseInt(event.start.time.minutes)) * 2) + 'px') }}
                             className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`}
                         ></div>
@@ -501,10 +530,12 @@ export default class Timeline extends Component {
                                 pathname: '/new', state: {
                                     start: {
                                         hours: event.start.time.hours,
+                                        // eslint-disable-next-line
                                         minutes: parseInt(event.end.time.minutes) + 1
                                     },
                                     end: {
                                         hours: event.start.time.hours,
+                                        // eslint-disable-next-line
                                         minutes: parseInt(events[index + 1].start.time.minutes) - 1
                                     },
                                     room
@@ -513,10 +544,13 @@ export default class Timeline extends Component {
                             onMouseOver={this.highlightRoom}
                             onMouseOut={this.stopHighlighting}
                             className={'select-room s'}
+                            // eslint-disable-next-line
                             style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}
 
                         >
-                            <button style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}>
+                            <button
+                                // eslint-disable-next-line
+                                style={{ width: (parseInt(events[index + 1].start.time.minutes) - parseInt(event.end.time.minutes)) + 'px' }}>
                                 +
                             </button>
                         </Link>
@@ -541,6 +575,7 @@ export default class Timeline extends Component {
                                 minutes: '00'
                             },
                             end: {
+                                // eslint-disable-next-line
                                 hours: (+time + 1) == 24 ? '00' : (+time + 1) < 10 ? '0' + (+time + 1).toString() : (+time + 1),
                                 minutes: '00'
                             },
@@ -567,11 +602,12 @@ export default class Timeline extends Component {
             const floors = this.state.floors.map((floor, key) => {
                 const floorJSX = (
                     <div key={key} className={'floor f-' + floor.num}>
-                        {index == 0 && <span className="floor-num">{floor.num} этаж</span>}
+                        { index === 0 && <span className="floor-num">{floor.num} этаж</span> }
                         <div className="rows">
-                            {floor.rooms.map((room, k) => (
+                            {   // eslint-disable-next-line
+                                floor.rooms.map((room, k) => (
                                 <div className={'room r-' + room.id}>
-                                    { index == 0 && <div className="scrolled-tag">{room.name}</div> }
+                                    { index === 0 && <div className="scrolled-tag">{room.name}</div> }
                                     {this.createButtons(index, floor.num, room, data).map(btn => btn)}
                                 </div>
                                 )
@@ -607,9 +643,11 @@ export default class Timeline extends Component {
 
     filterEvents = e => {
         const currentTime = this.determineTime()
+        // eslint-disable-next-line
         let newEvents = this.state.events.map(event => {
             const month = event.start.month,
                 day = event.start.day
+                // eslint-disable-next-line
             if (month == (e.detail.month + 1) && day == e.detail.day)
                 return event
         }).filter(item => item !== undefined)

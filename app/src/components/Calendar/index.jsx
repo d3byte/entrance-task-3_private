@@ -4,7 +4,6 @@ export default class Calendar extends Component {
     constructor() {
         super()
         this.state = {
-            currentDay: new Date().getDate(),
             monthIndex: 2,
             h5: new Date().getDate() + '&#183; Сегодня',
             hide: true,

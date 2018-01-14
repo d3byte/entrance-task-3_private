@@ -215,7 +215,7 @@ export default class Main extends Component {
                 <div class="modal">
                     <div class="modal-body">
                         <div class="col centered">
-                            <img src={emoji2}/>
+                            <img src={emoji2} alt="emogi"/>
                             <h4>Встреча создана!</h4>
                             <p class="text-center">
                                 14 декабря, 15:00–17:00 <br/>
