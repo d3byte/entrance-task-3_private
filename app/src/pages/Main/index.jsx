@@ -27,16 +27,16 @@ export default class Main extends Component {
                 "dateStart": "2017-12-28T12:16:23.309Z",
                 "dateEnd": "2017-12-28T14:57:23.309Z",
                 "users": [
-                {
-                    "id": "1",
-                    "name": "Дарт Вейдер",
-                    "login": "veged"
+                { 
+                    "id": "3",
+                    "name": 'Дарт Вейдер',
+                    "floor": "1" 
                 },
                 {
-                    "id": "2",
-                    "name": "Лекс Лютор",
-                    "login": "alt-j"
-                }
+                    "id": "1",
+                    "name": 'Лекс Лютор',
+                    "floor": "7"
+                },
                 ],
                 "room": {
                     "id": "1",
@@ -51,15 +51,14 @@ export default class Main extends Component {
                 "dateStart": "2017-12-28T14:57:23.309Z",
                 "dateEnd": "2017-12-28T15:57:23.309Z",
                 "users": [
-                {
-                    "id": "2",
-                    "name": "Лекс Лютор",
-                    "login": "alt-j"
+                { 
+                    "id": "1",
+                    "name": 'Лекс Лютор',
+                    "floor": "7"
                 },
-                {
-                    "id": "3",
-                    "name": "Кларк Кент",
-                    "login": "yeti-or"
+                {   "id": "4",
+                    "name": 'Кларк Кент',
+                    "floor": "2" 
                 }
                 ],
                 "room": {
@@ -76,14 +75,14 @@ export default class Main extends Component {
                 "dateEnd": "2017-12-28T21:57:23.309Z",
                 "users": [
                 {
-                    "id": "1",
-                    "name": "Дарт Вейдер",
-                    "login": "veged"
+                    "id": "3",
+                    "name": 'Дарт Вейдер',
+                    "floor": "1"
                 },
                 {
-                    "id": "3",
-                    "name": "Кларк Кент",
-                    "login": "yeti-or"
+                    "id": "4",
+                    "name": 'Кларк Кент',
+                    "floor": "2"
                 }
                 ],
                 "room": {
@@ -100,19 +99,19 @@ export default class Main extends Component {
                 "dateEnd": "2017-12-28T23:00:00.309Z",
                 "users": [
                     {
+                        "id": "4",
+                        "name": 'Кларк Кент',
+                        "floor": "2"
+                    },
+                    {
                         "id": "3",
-                        "name": "Кларк Кент",
-                        "login": "yeti-or"
+                        "name": 'Дарт Вейдер',
+                        "floor": "1"
                     },
                     {
                         "id": "1",
-                        "name": "Дарт Вейдер",
-                        "login": "veged"
-                    },
-                    {
-                        "id": "2",
-                        "name": "Лекс Лютор",
-                        "login": "alt-j"
+                        "name": 'Лекс Лютор',
+                        "floor": "7"
                     },
                 ],
                 "room": {
@@ -217,7 +216,7 @@ export default class Main extends Component {
     }
 
     render() {
-        const { location } = this.props
+        const { location, history } = this.props
         let info
         if(localStorage.info) {
             info = JSON.parse(localStorage.info)
@@ -233,11 +232,11 @@ export default class Main extends Component {
                 {
                     this.screenWidth <= 768 ? (
                         <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')} onScroll={this.handleScroll}>
-                            <Timeline events={this.state.events} />
+                            <Timeline history={history} events={this.state.events} />
                         </div>
                     ) : (
                         <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')}>
-                            <Timeline events={this.state.events} />
+                            <Timeline history={history} events={this.state.events} />
                         </div>
                     )
                 }

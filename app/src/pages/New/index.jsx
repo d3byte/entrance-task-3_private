@@ -24,10 +24,10 @@ export default class New extends Component {
             ],
             room: null,
             users: [
-                { id: 1, name: 'Лекс Лютер', floor: 7 },
-                { id: 2, name: 'Томас Андерсон', floor: 2 },
-                { id: 3, name: 'Дарт Вейдер', floor: 1 },
-                { id: 4, name: 'Кларк Кент', floor: 2 }
+                { "id": "1", "name": 'Лекс Лютор', "floor": "7" },
+                { "id": "2", "name": 'Томас Андерсон', "floor": "2" },
+                { "id": "3", "name": 'Дарт Вейдер', "floor": "1" },
+                { "id": "4", "name": 'Кларк Кент', "floor": "2" }
             ],
             invitedUsers: [],
             showUsers: false,
@@ -108,8 +108,8 @@ export default class New extends Component {
             return
         const { start, end, room } = location
         this.setState({
-            start: start.hours + ':' + start.minutes,
-            end: end.hours + ':' + end.minutes,
+            start: start.time.hours + ':' + start.time.minutes,
+            end: end.time.hours + ':' + end.time.minutes,
             room: room
         })
     }

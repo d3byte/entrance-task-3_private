@@ -313,11 +313,11 @@ button.button:disabled {
 }
 
 a.button-wrapper {
-  margin: 0 0 0 20px;
+  margin: 0 20px 0 20px;
 }
 
 a.button-wrapper + button {
-  margin: 0 0 0 20px;
+  margin: 0 20px 0 20px;
 }
 
 a.button-wrapper:first-of-type {
@@ -789,5 +789,9 @@ a {
 
 .separator.active {
   background: #99A9B9;
+}
+
+.error-input {
+  border: 2px solid #e94f37 !important;
 }
 /*# sourceMappingURL=style.css.map */

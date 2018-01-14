@@ -13,8 +13,10 @@ export default class Edit extends Component {
     constructor() {
         super()
         this.state = {
+            id: null,
             start: '',
             end: '',
+            floor: null,
             date: '',
             dateInput: '',
             rooms: [
@@ -25,10 +27,10 @@ export default class Edit extends Component {
             ],
             room: null,
             users: [
-                { id: 1, name: 'Лекс Лютер', floor: 7 },
-                { id: 2, name: 'Томас Андерсон', floor: 2 },
-                { id: 3, name: 'Дарт Вейдер', floor: 1 },
-                { id: 4, name: 'Кларк Кент', floor: 2 }
+                { "id": "1", "name": 'Лекс Лютор', "floor": "7" },
+                { "id": "2", "name": 'Томас Андерсон', "floor": "2" },
+                { "id": "3", "name": 'Дарт Вейдер', "floor": "1" },
+                { "id": "4", "name": 'Кларк Кент', "floor": "2" }
             ],
             invitedUsers: [],
             showUsers: false,
@@ -89,6 +91,8 @@ export default class Edit extends Component {
         const { day, month, year } = e.detail,
             date = new Date()
             
+        console.log(day, month, year)
+
         if (day < date.getDate()) {
             // Оповестить пользователя, что нельзя ставить прошедшие даты
             console.log(false)
@@ -96,23 +100,36 @@ export default class Edit extends Component {
              
         const dateInput = `${day} ${this.monthNumToText(month)}, ${year}`
 
+        console.log(dateInput)
+
         this.setState({
             date: `${year}-${month}-${day}`,
             dateInput
-        })
-
-        
+        }, () => console.log(this.state.date, this.state.dateInput))
     }
 
     setPropsInfo = location => {
         if(!location)
             return
-        const { start, end, room } = location
+        const { start, end, room, id, title, users, floor } = location
+        let newUsers = this.state.users.slice(0).filter(user => {
+            let isUsed = false
+            users.map(item => {
+                if(item.id == user.id)
+                    isUsed = true
+            })
+            return isUsed ? undefined : user
+        }).filter(item => item !== undefined)
         this.setState({
-            start: start.hours + ':' + start.minutes,
-            end: end.hours + ':' + end.minutes,
-            room: room
+            start: start.time.hours + ':' + start.time.minutes,
+            end: end.time.hours + ':' + end.time.minutes,
+            room: room,
+            theme: title,
+            floor,
+            invitedUsers: users,
+            users: newUsers
         })
+        this.handleDateInput({ detail: { day: start.day, month: parseInt(start.month) - 1, year: start.year } })
     }
 
     chooseRoom = room => {
@@ -210,7 +227,6 @@ export default class Edit extends Component {
     componentDidMount = () => {
         if(this.props && this.props.location)
             this.setPropsInfo(this.props.location.state)
-        this.setTodayDate()
         document.addEventListener('new-date', this.handleDateInput)
     }
 
@@ -228,7 +244,7 @@ export default class Edit extends Component {
                 <main>
                     <div className="container">
                         <div className="row space-between">
-                            <h4>Новая встреча</h4>
+                            <h4>Редактирование встречи</h4>
                             <div className="icon-container hide-mobile">
                                 <img src={close} alt="close-icon" onClick={this.reset} />
                             </div>
@@ -339,7 +355,7 @@ export default class Edit extends Component {
                                             <div className="room">
                                                 <div className="info">
                                                     <span className="time">{this.state.start}–{this.state.end}</span>
-                                                    <span className="location">{this.state.room.title} &#183; {this.state.room.floor} этаж</span>
+                                                    <span className="location">{this.state.room.title} &#183; {this.state.floor} этаж</span>
                                                 </div>
                                                 <img src={closeWhite} alt="close" onClick={this.cancelRoom} />
                                             </div>

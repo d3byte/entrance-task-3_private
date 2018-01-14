@@ -181,7 +181,7 @@ export default class Timeline extends Component {
                 <div class="avatar">
                     <img src="${close}">
                 </div>
-                <span class="name">${event.users[0].login}</span>
+                <span class="name">${event.users[0].name}</span>
                 <span class="left">и ${event.users.length - 1} участников</span> 
             </div>
             `
