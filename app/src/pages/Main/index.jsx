@@ -4,6 +4,7 @@ import Header from '../../components/Header'
 import Leftbar from '../../components/Leftbar'
 import Timeline from '../../components/Timeline'
 
+import emoji2 from '../../assets/img/emoji2.svg'
 
 export default class Main extends Component {
     constructor() {
@@ -11,8 +12,11 @@ export default class Main extends Component {
         this.state = {
             data: ['room', 'room'],
             events: [],
-            rooms: []
+            rooms: [],
+            scrolled: false
         }
+        this.scroll = 0
+        this.screenWidth = window.screen.innerWidth || document.clientWidth || document.body.clientWidth
     }
 
     fetchEvents = ms => {
@@ -170,10 +174,19 @@ export default class Main extends Component {
     }
 
     componentDidMount = () => {
-      this.fetchEvents(0).then(events => {
-          let newEvents = this.handleEventData(events)
-          this.setState({ events: newEvents })
-      })
+        this.fetchEvents(0).then(events => {
+            let newEvents = this.handleEventData(events)
+            this.setState({ events: newEvents })
+        })
+    }
+
+    handleScroll = e => {
+        // let scroll = e.currentTarget.scrollLeft
+        if (e.currentTarget.scrollLeft >= 50 && !this.state.scrolled) {
+            this.setState({ scrolled: true })
+        } else if (e.currentTarget.scrollLeft < -50) {
+            this.setState({ scrolled: false })
+        }
     }
     
 
@@ -183,11 +196,39 @@ export default class Main extends Component {
         <div>
             <Header path={location.pathname} />
             <main className="main-page">
-                <Leftbar path={location.pathname} data={this.state.data}/>
-                <div className="right-bar">
-                    <Timeline events={this.state.events}/>
-                </div>
+                {   !this.state.scrolled ? 
+                    <Leftbar path={location.pathname} data={this.state.data}/> :
+                        <div className="hide"><Leftbar path={location.pathname} data={this.state.data} /></div>
+                }
+                {
+                    this.screenWidth <= 768 ? (
+                        <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')} onScroll={this.handleScroll}>
+                            <Timeline events={this.state.events} />
+                        </div>
+                    ) : (
+                        <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')}>
+                            <Timeline events={this.state.events} />
+                        </div>
+                    )
+                }
             </main>
+            <div id="created-meeting" class="modal-box hide">
+                <div class="modal">
+                    <div class="modal-body">
+                        <div class="col centered">
+                            <img src={emoji2}/>
+                            <h4>Встреча создана!</h4>
+                            <p class="text-center">
+                                14 декабря, 15:00–17:00 <br/>
+                                Готем &#183; 4 этаж
+                            </p>
+                        </div>
+                        <div class="row centered">
+                            <button class="button blue" data-action="modal-close">Хорошо</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         )
     }

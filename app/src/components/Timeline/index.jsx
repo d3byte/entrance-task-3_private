@@ -111,7 +111,6 @@ export default class Timeline extends Component {
 
     // Основная функция, создающая тултип
     createTooltip = (e, event) => {
-        console.log(event)
         this.removePreviousTooltip()
         let tooltip = document.createElement('div')
         tooltip.classList.add('tooltip')
@@ -139,11 +138,10 @@ export default class Timeline extends Component {
             <div class="avatar">
                 <img src="${close}">
             </div>
-            <span class="name">${event.users[0].name}</span>
+            <span class="name">${event.users[0].login}</span>
             <span class="left">и ${event.users.length - 1} участников</span> 
         </div>
-    `
-
+        `
         if (this.screenWidth <= 768) {
             tooltip.style.width = this.screenWidth
         }
@@ -534,11 +532,11 @@ export default class Timeline extends Component {
             const floors = this.state.floors.map((floor, key) => {
                 const floorJSX = (
                     <div key={key} className={'floor f-' + floor.num}>
-                        <span className="floor-num">{floor.num} этаж</span>
+                        {index == 0 && <span className="floor-num">{floor.num} этаж</span>}
                         <div className="rows">
                             {floor.rooms.map((room, k) => (
                                 <div className={'room r-' + room.id}>
-                                    <div className="scrolled-tag">{room.name}</div>
+                                    { index == 0 && <div className="scrolled-tag">{room.name}</div> }
                                     {this.createButtons(index, floor.num, room, data).map(btn => btn)}
                                 </div>
                                 )

@@ -132,7 +132,10 @@ $light-gray: #E9ECEF
             
 
     .right-bar .timeline .time-area .timing + .floors .floor:first-of-type .room:first-of-type
-        margin-top: 0
+        margin-top: 0 !important
+
+    .right-bar.scrolled .timeline .time-area .timing + .floors .floor:first-of-type .room:first-of-type
+        margin-top: 51px !important
     
     .right-bar .timeline .time-area .rows .room,
     .right-bar .timeline .time-area .rows .room button,
@@ -160,7 +163,8 @@ $light-gray: #E9ECEF
         &.scrolled
             width: 100%
             .timeline .time-area .floor .room
-                height: 56px !important
+                min-height: 56px !important
+                border-bottom: 1px solid #E9ECEF !important
             .timeline .time-area .floor .room .scrolled-tag
                 display: block
             .timeline .time-area:first-of-type
