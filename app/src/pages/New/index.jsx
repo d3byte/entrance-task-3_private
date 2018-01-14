@@ -24,8 +24,14 @@ export default class New extends Component {
                 { id: 4, title: 'Оранжевый тюльпан', capacity: 'До 10 человек', floor: 6 }
             ],
             room: null,
-            users: [],
+            users: [
+                { id: 1, name: 'Лекс Лютер', floor: 7 },
+                { id: 2, name: 'Томас Андерсон', floor: 2 },
+                { id: 3, name: 'Дарт Вейдер', floor: 1 },
+                { id: 4, name: 'Кларк Кент', floor: 2 }
+            ],
             invitedUsers: [],
+            showUsers: false,
             theme: '',
             error_start: false,
             error_end: false
@@ -59,7 +65,7 @@ export default class New extends Component {
         
         const text = `${day} ${month}, ${year}`
 
-        return text
+        this.setState({ dateInput: text })
     }
 
     handleThemeInput = e => {
@@ -113,6 +119,66 @@ export default class New extends Component {
 
     cancelRoom = () => {
         this.setState({ room: null })
+    }
+
+    userInputHandler = e => {
+        const text = e.target.value
+        if (text !== '') {
+            var suitableUser = this.state.users.map(user => {
+                if (user.name.indexOf(text) !== -1) {
+                    return user
+                }
+            })
+            suitableUser = suitableUser.filter(item => item != undefined)
+            if (suitableUser[0]) {
+                let newUsers = this.state.users.slice(0).filter(user => user != suitableUser[0])
+                newUsers.unshift(suitableUser[0])
+                this.setState({ users: newUsers })
+            }
+        }
+    }
+
+    addUser = user => {
+        let invitedUsers = this.state.invitedUsers.slice(0),
+            users = this.state.users.slice(0).filter(item => item != user)
+        invitedUsers.push(user)
+        this.setState({ users, invitedUsers, showUsers: false })
+        // Создаю эвент об успешном добавлении
+        // const personAdded = new Event('person-added')
+        // document.dispatchEvent(personAdded)
+        // document.querySelector('.input-dropdown').classList.add('hide')
+    }
+
+    removeUser = user => {
+        let invitedUsers = this.state.invitedUsers.slice(0).filter(invitedUser => invitedUser.id != user.id),
+            users = this.state.users.slice(0)
+        users.push(user)
+        this.setState({ users, invitedUsers })
+    }
+
+    showUserList = () => {
+        this.setState({ showUsers: true })
+    }
+
+    hideUserList = e => {
+        // Проверяю, если был нажат элемент списка пользователей
+        const clickedPlace = e.nativeEvent.explicitOriginalTarget,
+            allowedClasses = ['name', 'input-dropdown', 'people', 'person', 'avatar', 'dot', 'floor']
+
+        let clickedPerson = false
+        
+        allowedClasses.map(className => {
+            if (clickedPlace.classList && clickedPlace.classList.contains(className)) {
+                clickedPerson = true
+            }
+        })
+        // Если нажат не список, то закрываю меню сразу. Если список, то закрываю после того,
+        // как список обновлён
+        if (!clickedPerson) {
+            this.setState({ showUsers: false })
+        } else {
+            
+        }
     }
 
     componentDidMount = () => {
@@ -183,12 +249,44 @@ export default class New extends Component {
                             <div className="row-col">
                                 <div className="labeled-input participants">
                                     <label>Участники</label>
-                                    <input type="text" placeholder="Например, Тор Одинович" />
-                                    <div className="input-dropdown hide">
+                                    <input 
+                                        type="text" placeholder="Например, Тор Одинович" 
+                                        onChange={this.userInputHandler}
+                                        onFocus={this.showUserList}
+                                        onBlur={this.hideUserList}
+                                    />
+                                    <div className={`input-dropdown ${this.state.showUsers ? '' : 'hide'}`}>
                                         <ul className="people">
+                                        {
+                                                this.state.users.map((user, key) => (
+                                                <li 
+                                                    className={`person p-${user.id} ${this.state.users[0].id == user.id ? 'suitable': ''}`} 
+                                                    onClick={() => this.addUser(user)} key={key}
+                                                >
+                                                    <img src={close} className="avatar"/>
+                                                    <span className="name">{user.name}</span>
+                                                    <span className="dot">&#183;</span>
+                                                    <span className="floor">{user.floor} этаж</span>
+                                                </li>
+                                            ))
+                                        }
                                         </ul>
                                     </div>
                                     <div className="invited-people">
+                                    {
+                                        this.state.invitedUsers && this.state.invitedUsers.map((user, key) => (
+                                            <div key={key} className={`invited-person p-${user.id}`}>
+                                                <div className="person-wrapper">
+                                                    <img src={closeWhite} className="avatar"/>
+                                                    {user.name}
+                                                </div>
+                                                <img 
+                                                    onClick={() => this.removeUser(user)}
+                                                    src={close} alt="close" 
+                                                />
+                                            </div>
+                                        ))
+                                    }
                                     </div>
                                 </div>
                             </div>
