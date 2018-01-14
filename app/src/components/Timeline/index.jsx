@@ -602,12 +602,12 @@ export default class Timeline extends Component {
             const floors = this.state.floors.map((floor, key) => {
                 const floorJSX = (
                     <div key={key} className={'floor f-' + floor.num}>
-                        { index === 0 && <span className="floor-num">{floor.num} этаж</span> }
+                        { index === 0 && (<span className="floor-num">{floor.num} этаж</span>) }
                         <div className="rows">
                             {   // eslint-disable-next-line
                                 floor.rooms.map((room, k) => (
                                 <div className={'room r-' + room.id}>
-                                    { index === 0 && <div className="scrolled-tag">{room.name}</div> }
+                                    { index === 0 && <div className="scrolled-tag">{room.title}</div> }
                                     {this.createButtons(index, floor.num, room, data).map(btn => btn)}
                                 </div>
                                 )
@@ -621,7 +621,7 @@ export default class Timeline extends Component {
             // eslint-disable-next-line
             const timeArea = (
                 // eslint-disable-next-line
-                <div className={`time-area ta-${index} ${item.date == currentTime.time ? 'current' : ''}`}>
+                <div key={index} className={`time-area ta-${index} ${item.date == currentTime.time ? 'current' : ''}`}>
                     <div className="timing">
                         {
                             // eslint-disable-next-line
@@ -644,13 +644,15 @@ export default class Timeline extends Component {
     filterEvents = e => {
         const currentTime = this.determineTime()
         // eslint-disable-next-line
-        let newEvents = this.state.events.map(event => {
+        let newEvents = this.state.events.slice(0)
+        newEvents = newEvents.map(event => {
             const month = event.start.month,
                 day = event.start.day
-                // eslint-disable-next-line
-            if (month == (e.detail.month + 1) && day == e.detail.day)
+            // eslint-disable-next-line
+            if (e && e.detail && month == (e.detail.month + 1) && day == e.detail.day)
                 return event
         }).filter(item => item !== undefined)
+        console.log(newEvents)
         this.setState({ renderData: this.computeDataToRender(currentTime, newEvents), })
     }
 
@@ -664,6 +666,7 @@ export default class Timeline extends Component {
     }
 
     componentWillReceiveProps = props => {
+        console.log(props)
         const currentTime = this.determineTime()
         this.addStyle(currentTime)
         this.setState({
@@ -671,7 +674,10 @@ export default class Timeline extends Component {
             renderData: this.computeDataToRender(currentTime, props.events),
             events: props.events
         })
-        this.filterEvents(props.events, currentTime)
+        this.filterEvents({ detail: {
+            month: new Date().getMonth(),
+            day: new Date().getDate()
+        } })
     }
 
     render = () => {

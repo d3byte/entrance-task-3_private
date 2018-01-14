@@ -8,7 +8,8 @@ export default class Calendar extends Component {
             h5: new Date().getDate() + '&#183; Сегодня',
             hide: true,
             months: [],
-            currentDay: {}
+            currentDay: 0,
+            currentTime: {}
         }
 
         this.dayChanged = new Event('day-changed')
@@ -96,6 +97,7 @@ export default class Calendar extends Component {
         document.dispatchEvent(update)
 
         this.setState({
+            currentDay: time.day,
             monthIndex: indexOfMonth,
             h5
         })
@@ -188,33 +190,33 @@ export default class Calendar extends Component {
     nextDay = months => {
         var monthInfo = {}
         months[this.state.monthIndex - 1].days.map(week => {
-        for (let day of week) {
-            if (day === (this.state.currentDay + 1)) {
-            monthInfo = {
-                month: months[this.state.monthIndex - 1],
-                indexOfWeek: months[this.state.monthIndex - 1].days.indexOf(week),
-                indexOfDay: week.indexOf(this.state.currentDay + 1),
-                indexOfMonth: this.state.monthIndex
+            for (let day of week) {
+                if (day === (this.state.currentDay + 1)) {
+                    monthInfo = {
+                        month: months[this.state.monthIndex - 1],
+                        indexOfWeek: months[this.state.monthIndex - 1].days.indexOf(week),
+                        indexOfDay: week.indexOf(this.state.currentDay + 1),
+                        indexOfMonth: this.state.monthIndex
+                    }
+                    break
+                }
             }
-            break
-            }
-        }
-        return false
+            return false
         })
         this.setState({ currentDay: this.state.currentDay + 1 })
         if (this.state.currentDay > this.daysInMonth(this.getMonthIndex(months[this.state.monthIndex - 1].name), new Date().getFullYear()) && this.state.monthIndex !== 3) {
-        this.setState({ currentDay: 0, monthIndex: this.state.monthIndex + 1 })
-        monthInfo = {
-            month: months[this.state.monthIndex - 1],
-            indexOfWeek: 0,
-            indexOfDay: 0,
-            indexOfMonth: this.state.monthIndex
-        }
-        this.changeDay(monthInfo, true)
+            this.setState({ currentDay: 0, monthIndex: this.state.monthIndex + 1 })
+            monthInfo = {
+                month: months[this.state.monthIndex - 1],
+                indexOfWeek: 0,
+                indexOfDay: 0,
+                indexOfMonth: this.state.monthIndex
+            }
+            this.changeDay(monthInfo, true)
         } else if (this.state.currentDay > this.daysInMonth(new Date().getMonth() + 1, new Date().getFullYear()) && this.state.monthIndex === 3) {
-        return
+            return
         } else {
-        this.changeDay(monthInfo, true)
+            this.changeDay(monthInfo, true)
         }
     }
 
@@ -261,25 +263,25 @@ export default class Calendar extends Component {
             clickedDate = false,
             clickedPlace
 
-        if (e.type !== 'click') {
+        if (this.screenWidth > 768) {
             clickedPlace = e.explicitOriginalTarget
-        } else if (this.screenWidth <= 768 && e.type === 'click'){
-            clickedDate = e.target
-            document.querySelector('body .container').removeEventListener('click', e => this.hideMeetingCalendar(e))
+        } else {
+            clickedDate = true
+            document.querySelector('body .container').removeEventListener('click', this.hideMeetingCalendar)
         }
 
         let activeDate = document.querySelector('td.today')
         if (activeDate) {
             activeDate.classList.remove('today')
         }
-        if (clickedPlace.tagName === 'TD') {
+        if (clickedPlace && clickedPlace.tagName === 'TD') {
             clickedPlace.classList.add('today')
-        } else if (clickedPlace.parentElement.tagName === 'TD') {
+        } else if (clickedPlace && clickedPlace.parentElement.tagName === 'TD') {
             clickedPlace.parentElement.classList.add('today')
         }
         allowedClasses.map(className => {
-            if ((clickedPlace.classList && clickedPlace.classList.contains(className)) ||
-                (clickedPlace.parentElement.classList && clickedPlace.parentElement.classList.contains(className))
+            if ((clickedPlace && clickedPlace.classList && clickedPlace.classList.contains(className)) ||
+                (clickedPlace && clickedPlace.parentElement.classList && clickedPlace.parentElement.classList.contains(className))
             ) {
                 clickedDate = true
             }
@@ -289,6 +291,7 @@ export default class Calendar extends Component {
         // как дата обновлена
         if (clickedDate) {
             document.addEventListener('day-changed', () => {
+                document.querySelector('h4').innerText = clickedDate
                 document.querySelector('.calendar.editor').classList.add('hide')
             })
         } else {
@@ -316,7 +319,8 @@ export default class Calendar extends Component {
 
         this.setState({
             h5: text, 
-            currentDay: {
+            currentDay: day,
+            currentTime: {
                 day,
                 month: date.getMonth()
             }
@@ -332,23 +336,51 @@ export default class Calendar extends Component {
 
         if (this.screenWidth <= 768) {
         document.addEventListener('header-rendered', () => {
-            document.querySelector('header .date h5').innerHTML = text
-            const toggle = new Event('toggle-header-calendar')
-            document.dispatchEvent(toggle)
-            document.querySelector('header .date h5').addEventListener('click', this.toggleCalendar)
-            document.querySelector('header .date .next').addEventListener('click', () => {
-                this.nextDay([previousMonth, currentMonth, nextMonth])
-            })
-            document.querySelector('header .date .previous').addEventListener('click', () => {
-                this.prevDay([previousMonth, currentMonth, nextMonth])
-            })
+            let header = document.getElementById('calendar-header-date')
+            if(header) {
+                header.innerHTML = text
+                header.addEventListener('click', this.toggleCalendar)
+            }
+
+            let next = document.getElementById('header-right')
+            if(next) {
+                next.addEventListener('click', () => {
+                    this.nextDay([previousMonth, currentMonth, nextMonth])
+                })
+            }
+
+            let prev = document.getElementById('header-left')
+            if(prev) {
+                prev.addEventListener('click', () => {
+                    this.prevDay([previousMonth, currentMonth, nextMonth])
+                })
+            }
         })
         } else {
         document.addEventListener('left-bar-rendered', () => {
             const toggle = new Event('toggle-left-bar-calendar')
             document.dispatchEvent(toggle)
-            document.querySelector('.left-bar .date h5').innerHTML = text
-            document.querySelector('.left-bar .date h5').addEventListener('click', this.toggleCalendar)
+            const leftbar = document.querySelector('.left-bar .date h5')
+            if (leftbar) {
+                leftbar.innerHTML = text
+                leftbar.addEventListener('click', this.toggleCalendar)
+            }
+
+            let next = document.querySelector('.left-bar .date .next')
+            if (next) {
+                next.addEventListener('click', () => {
+                    this.nextDay([previousMonth, currentMonth, nextMonth])
+                })
+            }
+
+            let prev = document.querySelector('.left-bar .date .previous')
+            if (prev) {
+                prev.addEventListener('click', () => {
+                    this.prevDay([previousMonth, currentMonth, nextMonth])
+                })
+            }
+            
+            document.querySelector('.left-bar .date h5')
             document.querySelector('.left-bar .date .next').addEventListener('click', () => {
                 this.nextDay([previousMonth, currentMonth, nextMonth])
             })

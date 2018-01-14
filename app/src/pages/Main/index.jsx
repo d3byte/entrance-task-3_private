@@ -13,9 +13,9 @@ export default class Main extends Component {
             floors: [{ num: 7 }, { num: 6 }],
             events: [],
             rooms: [],
-            scrolled: false
+            scrolled: false,
+            date: ''
         }
-        this.scroll = 0
         this.screenWidth = window.screen.innerWidth || document.clientWidth || document.body.clientWidth
     }
 
@@ -174,7 +174,6 @@ export default class Main extends Component {
     }
 
     handleScroll = e => {
-        // let scroll = e.currentTarget.scrollLeft
         if (e.currentTarget.scrollLeft >= 50 && !this.state.scrolled) {
             this.setState({ scrolled: true })
         } else if (e.currentTarget.scrollLeft < -50) {
@@ -220,10 +219,8 @@ export default class Main extends Component {
     render() {
         const { location } = this.props
         let info
-        console.log(localStorage.info)
         if(localStorage.info) {
             info = JSON.parse(localStorage.info)
-            console.log(info)
         }
         return (
         <div>
@@ -259,7 +256,7 @@ export default class Main extends Component {
                                     </p>
                                 </div>
                                 <div className="row centered md">
-                                    <button className="button blue" data-action="modal-close" onClick={this.hideModal}>Хорошо</button>
+                                    <button className="button blue" onClick={this.hideModal}>Хорошо</button>
                                 </div>
                             </div>
                         </div>

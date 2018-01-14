@@ -169,16 +169,17 @@ export default class New extends Component {
         let clickedPerson = false
         
         allowedClasses.map(className => {
-            if (clickedPlace.classList && clickedPlace.classList.contains(className)) {
+            if (clickedPlace && clickedPlace.classList && clickedPlace.classList.contains(className)) {
                 clickedPerson = true
             }
         })
         // Если нажат не список, то закрываю меню сразу. Если список, то закрываю после того,
         // как список обновлён
-        if (!clickedPerson) {
+        
+        if (!clickedPerson && this.screenWidth > 768) {
             this.setState({ showUsers: false })
-        } else {
-            
+        } else if(this.screenWidth <= 768) {
+            return
         }
     }
 
@@ -354,10 +355,7 @@ export default class New extends Component {
             </div>
             <footer>
                 {
-                    this.state.invitedUsers.length > 0 && this.state.theme.length > 0 &&
-                    this.state.room !== null && this.state.date.length > 0 &&
-                    this.state.start.length === 5 && this.state.end.length === 5 &&
-                    !this.state.error_end && !this.state.error_start && (
+                    this.state.room === null  && (
                         <div className="hide-desktop">
                             Выберите переговорку
                         </div>

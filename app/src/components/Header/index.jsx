@@ -32,11 +32,11 @@ export default class Header extends Component {
                 {
                     path === '/' && (
                         <div className="date">
-                            <div className="icon-container previous">
+                            <div className="icon-container previous" id="header-left">
                                 <img src={leftArrow} alt="left-arrow" />
                             </div>
-                            <h5>14 дек. &#183; Сегодня </h5>
-                            <div className="icon-container next">
+                            <h5 id="calendar-header-date">14 дек. &#183; Сегодня </h5>
+                            <div className="icon-container next" id="header-right">
                                 <img src={rightArrow} alt="right-arrow" />
                             </div>
                         </div>
