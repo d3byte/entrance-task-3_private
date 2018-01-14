@@ -600,7 +600,11 @@ a
 .flex
   +flex-vertical-center
 
-.separator, .event-time
+.separator,
   min-width: 1px
   width: auto
-  height: 35px
+  min-height: 35px
+  height: 100%
+  transition: 0.2s
+  &.active
+    background: $column-show-tooltip

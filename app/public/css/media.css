@@ -172,6 +172,9 @@
   .tooltip {
     z-index: 999999;
   }
+  .separator, .event-time {
+    height: 60px;
+  }
 }
 
 @media (max-width: 648px) {

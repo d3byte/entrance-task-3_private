@@ -779,9 +779,15 @@ a {
   align-items: center;
 }
 
-.separator, .event-time {
+.separator {
   min-width: 1px;
   width: auto;
-  height: 35px;
+  min-height: 35px;
+  height: 100%;
+  transition: 0.2s;
+}
+
+.separator.active {
+  background: #99A9B9;
 }
 /*# sourceMappingURL=style.css.map */

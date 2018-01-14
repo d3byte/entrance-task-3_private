@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
+import edit from '../../assets/img/edit.svg'
+import close from '../../assets/img/close.svg'
+
 export default class Timeline extends Component {
     constructor() {
         super()
@@ -27,25 +30,31 @@ export default class Timeline extends Component {
                 },
             ],
             currentTime: null,
-            renderData: []
+            renderData: [],
+            active: null
         }
         this.screenWidth = window.screen.innerWidth || document.clientWidth || document.body.clientWidth
     }
 
-    // Определяю количество колонок, принадлежащих эвенту
-    determineColAmount = eventId => {
-        const amount = document.querySelectorAll(`.event-${eventId}`).length
-        return amount
-    }
-
     // Позиционирую стрелочку тултипа
-    positionArrow = ({ layerX }, right) => {
-        const css = `
+    positionArrow = (e, offset) => {
+        let width, css
+        if(!offset) {
+            width = parseInt(window.getComputedStyle(e.target).getPropertyValue('width'))
+            css = `
             .tooltip:before {
-                left: ${layerX}px !important;
+                left: ${Math.floor(width / 2)}px !important;
             }
-        `,
-            head = document.head || document.getElementsByTagName('head')[0],
+            `
+        } else {
+            width = parseInt(window.getComputedStyle(e.e.target).getPropertyValue('width'))
+            css = `
+            .tooltip:before {
+                left: ${e.difference + Math.floor((width / 2))}px !important;
+            }
+            `
+        }
+         const head = document.head || document.getElementsByTagName('head')[0],
             style = document.createElement('style');
         style.type = 'text/css';
         if (style.styleSheet) {
@@ -59,9 +68,7 @@ export default class Timeline extends Component {
 
     // Подсвечиваю колонки, принадлежащие эвенту
     highlightEventCols = (id, amount) => {
-        for (var i = 0; i < amount; i++) {
-            document.querySelectorAll(`.event-${id}`)[i].classList.add('active')
-        }
+        this.setState({ active: id })
     }
 
     // Преобразую номер месяца в текстовый эквивалент
@@ -76,20 +83,17 @@ export default class Timeline extends Component {
     }
 
     // Проверяю, помещается ли тултип на экране. Если нет - вношу коррективы в позиционирование
-    checkForContentOverlay = ({ clientX, layerX }, tooltip) => {
+    checkForContentOverlay = (e, tooltip) => {
         const leftBarWidth = window.getComputedStyle(document.querySelector('.left-bar'), null).getPropertyValue('width')
         // 350 - размер тултипа с запасом в 10px
-        if (this.screenWidth - clientX < 340) {
-            const difference = Math.abs(340 - (this.screenWidth - clientX))
-            let offset = layerX + difference
-            if (offset > 340)
-                offset = 320
+        if (this.screenWidth - e.clientX < 340) {
+            const difference = Math.abs(340 - (this.screenWidth - e.clientX))
             tooltip.style.left = '-' + difference + 'px'
-            this.positionArrow({ layerX: offset })
-        } else if (clientX - parseInt(leftBarWidth) < 30) {
-            const difference = Math.abs(35 - (clientX - parseInt(leftBarWidth)))
+            this.positionArrow({e, difference}, true)
+        } else if (e.clientX - parseInt(leftBarWidth) < 30) {
+            const difference = Math.abs(35 - (e.clientX - parseInt(leftBarWidth)))
             tooltip.style.left = + difference + 'px'
-            this.positionArrow({ layerX: Math.abs(layerX - difference) })
+            this.positionArrow({ e, difference }, true)
         }
     }
 
@@ -107,45 +111,43 @@ export default class Timeline extends Component {
 
     // Основная функция, создающая тултип
     createTooltip = (e, event) => {
+        console.log(event)
         this.removePreviousTooltip()
-        if (e.target.tagName != 'BUTTON') {
-            let tooltip = document.createElement('div'),
-                amount = this.determineColAmount(event.id)
-            tooltip.classList.add('tooltip')
-            this.highlightEventCols(event.id, amount)
-            this.positionArrow(e)
-            this.checkForContentOverlay(e, tooltip)
-            tooltip.innerHTML = `
-            <div class="header">
-                <span class="title">${event.title}</span>
-                <div class="icon-container">
-                    <img src="desktop-assets/edit-gray.png">
-                </div>
+        let tooltip = document.createElement('div')
+        tooltip.classList.add('tooltip')
+        this.highlightEventCols(event.id)
+        this.positionArrow(e)
+        this.checkForContentOverlay(e, tooltip)
+        tooltip.innerHTML = `
+        <div class="header">
+            <span class="title">${event.title}</span>
+            <div class="icon-container">
+                <img src="${edit}">
             </div>
-            <div class="time">
-                <span>
-                    ${event.start.day} ${this.monthNumToText(event.start.month)},
-                    ${event.start.time.hours}:${event.start.time.minutes}–${event.end.time.hours}:${event.end.time.minutes}
-                </span>
-                <span class="dot">&#183;</span>
-                <span>
-                    ${event.room.title}
-                </span>
+        </div>
+        <div class="time">
+            <span>
+                ${event.start.day} ${this.monthNumToText(event.start.month)},
+                ${event.start.time.hours}:${event.start.time.minutes}–${event.end.time.hours}:${event.end.time.minutes}
+            </span>
+            <span class="dot">&#183;</span>
+            <span>
+                ${event.room.title}
+            </span>
+        </div>
+        <div class="participants">
+            <div class="avatar">
+                <img src="${close}">
             </div>
-            <div class="participants">
-                <div class="avatar">
-                    <img src="desktop-assets/close.svg">
-                </div>
-                <span class="name">Дарт Вейдер</span>
-                <span class="left">и 12 участников</span> 
-            </div>
-        `
+            <span class="name">${event.users[0].name}</span>
+            <span class="left">и ${event.users.length - 1} участников</span> 
+        </div>
+    `
 
-            if (this.screenWidth <= 768) {
-                tooltip.style.width = this.screenWidth
-            }
-            e.target.appendChild(tooltip)
+        if (this.screenWidth <= 768) {
+            tooltip.style.width = this.screenWidth
         }
+        e.target.appendChild(tooltip)
     }
 
     // Определяю текущее время
@@ -361,7 +363,7 @@ export default class Timeline extends Component {
                             </Link>
                             <div
                                 onClick={e => this.createTooltip(e, event)}
-                                className={`separator e-${event.id}`} style={{ width: btnSize + 'px' }}>
+                                className={`separator e-${event.id} ${this.state.active === event.id ? 'active' : ''}`} style={{ width: btnSize + 'px' }}>
                             </div>
                         </div>
                     )
@@ -373,7 +375,7 @@ export default class Timeline extends Component {
                         <div className="flex">
                             <div
                                 onClick={e => this.createTooltip(e, event)}
-                                className={`separator e-${event.id}`} style={{ width: (parseInt(event.end.time.minutes)) + 'px' }}>
+                                className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`} style={{ width: (parseInt(event.end.time.minutes)) + 'px' }}>
                             </div>
                             <Link 
                                 to={{
@@ -402,7 +404,7 @@ export default class Timeline extends Component {
                     const space = (
                         <div
                             onClick={e => this.createTooltip(e, event)}
-                            className={`event-time e-${event.id}`}>
+                            className={`separator e-${event.id} ${this.state.active === event.id ? 'active' : ''}`}>
                         </div>
                     )
                     buttons.push(space)
@@ -417,7 +419,7 @@ export default class Timeline extends Component {
                         <div
                             onClick={e => this.createTooltip(e, event)}
                             style={{ width: this.screenWidth < 1920 ? (parseInt(event.end.time.minutes) + 'px') : ((parseInt(event.end.time.minutes) * 2) + 'px') }}
-                            className={`separator e-${event.id}`}
+                            className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`}
                         ></div>
                     )
                     const link = (
@@ -451,7 +453,7 @@ export default class Timeline extends Component {
                         <div
                             onClick={e => this.createTooltip(e, event)}
                             style={{ width: this.screenWidth < 1920 ? ((60 - parseInt(event.start.time.minutes)) + 'px') : (((60 - parseInt(event.start.time.minutes)) * 2) + 'px') }}
-                            className={`separator e-${event.id}`}
+                            className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`}
                         ></div>
                     )
                     array.push(separator)
@@ -461,7 +463,7 @@ export default class Timeline extends Component {
                         <div
                             onClick={e => this.createTooltip(e, event)}
                             style={{ width: this.screenWidth < 1920 ? ((parseInt(event.end.time.minutes) - parseInt(event.start.time.minutes)) + 'px') : (((parseInt(event.end.time.minutes) - parseInt(event.start.time.minutes)) * 2) + 'px') }}
-                            className={`separator e-${event.id}`}
+                            className={`separator e-${event.id} ${this.state.active === event.id ? 'active': ''}`}
                         ></div>
                     )
                     const link = (

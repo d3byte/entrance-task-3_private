@@ -25,10 +25,12 @@ export default class Main extends Component {
                 "users": [
                 {
                     "id": "1",
+                    "name": "Дарт Вейдер",
                     "login": "veged"
                 },
                 {
                     "id": "2",
+                    "name": "Лекс Лютор",
                     "login": "alt-j"
                 }
                 ],
@@ -47,10 +49,12 @@ export default class Main extends Component {
                 "users": [
                 {
                     "id": "2",
+                    "name": "Лекс Лютор",
                     "login": "alt-j"
                 },
                 {
                     "id": "3",
+                    "name": "Кларк Кент",
                     "login": "yeti-or"
                 }
                 ],
@@ -69,10 +73,12 @@ export default class Main extends Component {
                 "users": [
                 {
                     "id": "1",
+                    "name": "Дарт Вейдер",
                     "login": "veged"
                 },
                 {
                     "id": "3",
+                    "name": "Кларк Кент",
                     "login": "yeti-or"
                 }
                 ],
@@ -90,13 +96,20 @@ export default class Main extends Component {
                 "dateEnd": "2017-12-28T23:00:00.309Z",
                 "users": [
                     {
+                        "id": "3",
+                        "name": "Кларк Кент",
+                        "login": "yeti-or"
+                    },
+                    {
                         "id": "1",
+                        "name": "Дарт Вейдер",
                         "login": "veged"
                     },
                     {
                         "id": "2",
+                        "name": "Лекс Лютор",
                         "login": "alt-j"
-                    }
+                    },
                 ],
                 "room": {
                     "id": "3",
@@ -145,9 +158,9 @@ export default class Main extends Component {
                 room: {
                     id: event.room.id,
                     title: event.room.title,
-                    capacity: event.room.capacity,
-                    users: event.users
+                    capacity: event.room.capacity
                 },
+                users: event.users,
                 start: this.splitDate(event.dateStart),
                 end: this.splitDate(event.dateEnd),
                 hoursIncluded: this.hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
