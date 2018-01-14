@@ -232,11 +232,11 @@ export default class Main extends Component {
                 {
                     this.screenWidth <= 768 ? (
                         <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')} onScroll={this.handleScroll}>
-                            <Timeline history={history} events={this.state.events} />
+                            <Timeline history={history} events={this.state.events} scroll={this.state.scrolled} />
                         </div>
                     ) : (
                         <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')}>
-                            <Timeline history={history} events={this.state.events} />
+                                    <Timeline history={history} events={this.state.events} scroll={this.state.scrolled} />
                         </div>
                     )
                 }

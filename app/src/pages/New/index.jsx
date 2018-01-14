@@ -108,8 +108,8 @@ export default class New extends Component {
             return
         const { start, end, room } = location
         this.setState({
-            start: start.time.hours + ':' + start.time.minutes,
-            end: end.time.hours + ':' + end.time.minutes,
+            start: start.hours + ':' + start.minutes,
+            end: end.hours + ':' + end.minutes,
             room: room
         })
     }
