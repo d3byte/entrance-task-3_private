@@ -17,7 +17,11 @@ export default class Header extends Component {
         const { path } = this.props
         return (
             <header className={path === '/' ? 'main-page' : ''}>
-                <Link to="/"><img src={logo} alt="logo"/></Link>
+                {
+                    path === '/' ? 
+                        <img src={logo} alt="logo" /> :
+                        <Link to="/"><img src={logo} alt="logo" /></Link>
+                }
                 {
                     path === '/' && (
                         <Link to="/new" className="button-wrapper">
