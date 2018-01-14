@@ -13,7 +13,7 @@ export default class Floor extends Component {
                     {
                         rooms.map((room, key) => (
                             <li key={key} className={'room r-' + room.id}>
-                                <span className="title">{room.name}</span>
+                                <span className="title">{room.title}</span>
                                 <br />
                                 <span className="capacity">{room.capacity}</span>
                             </li>

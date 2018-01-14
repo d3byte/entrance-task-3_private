@@ -13,19 +13,19 @@ export default class Timeline extends Component {
                 {
                     num: 7,
                     rooms: [
-                        { id: 1, name: 'Ржавый Фред', capacity: '3-6 человек' },
-                        { id: 2, name: 'Прачечная', capacity: 'До 10 человек' },
-                        { id: 3, name: 'Жёлтый Дом', capacity: 'До 10 человек' },
-                        { id: 4, name: 'Оранжевый тюльпан', capacity: 'До 10 человек' }
+                        { id: 1, title: 'Ржавый Фред', capacity: '3-6 человек', floor: 7 },
+                        { id: 2, title: 'Прачечная', capacity: 'До 10 человек', floor: 5 },
+                        { id: 3, title: 'Жёлтый Дом', capacity: 'До 10 человек', floor: 3 },
+                        { id: 4, title: 'Оранжевый тюльпан', capacity: 'До 10 человек', floor: 6 }
                     ]
                 },
                 {
                     num: 6,
                     rooms: [
-                        { id: 1, name: 'Ржавый Фред', capacity: '3-6 человек' },
-                        { id: 2, name: 'Прачечная', capacity: 'До 10 человек' },
-                        { id: 3, name: 'Жёлтый Дом', capacity: 'До 10 человек' },
-                        { id: 4, name: 'Оранжевый тюльпан', capacity: 'До 10 человек' }
+                        { id: 1, title: 'Ржавый Фред', capacity: '3-6 человек', floor: 7 },
+                        { id: 2, title: 'Прачечная', capacity: 'До 10 человек', floor: 5 },
+                        { id: 3, title: 'Жёлтый Дом', capacity: 'До 10 человек', floor: 3 },
+                        { id: 4, title: 'Оранжевый тюльпан', capacity: 'До 10 человек', floor: 6 }
                     ]
                 },
             ],

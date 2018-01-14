@@ -126,8 +126,10 @@ export default class Calendar extends Component {
             monthName = month.name.toLowerCase().slice(0, month.name.length - 1) + 'я',
             text = `${day} ${monthName}, ${new Date().getFullYear()}`
 
-        document.querySelector('.labeled-input.date input').value = text
+        const event = new CustomEvent('new-date', { detail: { day, month: this.getMonthIndex(month.name), year: new Date().getFullYear() } })
+
         document.querySelector('.calendar.editor').classList.add('hide')
+        document.dispatchEvent(event)
     }
 
     createMonth = (monthInfo, current = false, index, editor = false) => {
@@ -261,7 +263,7 @@ export default class Calendar extends Component {
 
         if (e.type !== 'click') {
             clickedPlace = e.explicitOriginalTarget
-        } else {
+        } else if (this.screenWidth <= 768 && e.type === 'click'){
             clickedDate = e.target
             document.querySelector('body .container').removeEventListener('click')
         }
@@ -296,7 +298,9 @@ export default class Calendar extends Component {
 
     showMeetingCalendar = () => {
         document.querySelector('.calendar.editor').classList.remove('hide')
-        document.querySelector('body .container').addEventListener('click', e => this.hideMeetingCalendar(e))
+        if(this.screenWidth <= 768) {
+            document.querySelector('body .container').addEventListener('click', e => this.hideMeetingCalendar(e))
+        }
     }
 
     fillMainCalendar = () => {
