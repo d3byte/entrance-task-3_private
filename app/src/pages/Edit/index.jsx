@@ -382,7 +382,7 @@ export default class Edit extends Component {
                         <button className="button">Отмена</button>
                     </Link>
                     <button class="button hide-mobile">Удалить встречу</button>
-                    <button 
+                    <button
                         class="button save blue"
                         disabled={
                             this.state.invitedUsers.length > 0 && this.state.theme.length > 0 &&
