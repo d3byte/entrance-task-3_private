@@ -9,26 +9,7 @@ export default class Timeline extends Component {
         super()
         this.state = {
             events: [],
-            floors: [
-                {
-                    num: 7,
-                    rooms: [
-                        { id: 1, title: 'Ржавый Фред', capacity: '3-6 человек', floor: 7 },
-                        { id: 2, title: 'Прачечная', capacity: 'До 10 человек', floor: 5 },
-                        { id: 3, title: 'Жёлтый Дом', capacity: 'До 10 человек', floor: 3 },
-                        { id: 4, title: 'Оранжевый тюльпан', capacity: 'До 10 человек', floor: 6 }
-                    ]
-                },
-                {
-                    num: 6,
-                    rooms: [
-                        { id: 1, title: 'Ржавый Фред', capacity: '3-6 человек', floor: 7 },
-                        { id: 2, title: 'Прачечная', capacity: 'До 10 человек', floor: 5 },
-                        { id: 3, title: 'Жёлтый Дом', capacity: 'До 10 человек', floor: 3 },
-                        { id: 4, title: 'Оранжевый тюльпан', capacity: 'До 10 человек', floor: 6 }
-                    ]
-                },
-            ],
+            floors: [],
             currentTime: null,
             renderData: [],
             active: null
@@ -140,15 +121,19 @@ export default class Timeline extends Component {
     }
 
     goTo = (e, event) => {
-        if (e.target.classList.contains('clickme') || e.target.parentElement.classList.contains('clickme')) {
+        if (e.target.classList.contains('clickme') || e.target.parentElement && e.target.parentElement.classList.contains('clickme')) {
+            document.removeEventListener('click', e => this.goTo(e, event))
             this.props.history.push({ pathname: '/edit', state: {
-                ...event
+                ...event,
+                allUsers: this.props.users,
+                floors: this.props.floors
             }})
         }
     }
 
     // Основная функция, создающая тултип
     createTooltip = (e, event) => {
+        console.log(event)
         document.removeEventListener('click', e => this.goTo(e, event))
         if(e.target.classList.contains(`e-${event.id}`)) {
             this.removePreviousTooltip()
@@ -179,9 +164,9 @@ export default class Timeline extends Component {
             </div>
             <div class="participants">
                 <div class="avatar">
-                    <img src="${close}">
+                    <img src="${event.users[0].avatarUrl}">
                 </div>
-                <span class="name">${event.users[0].name}</span>
+                <span class="name">${event.users[0].login}</span>
                 <span class="left">и ${event.users.length - 1} участников</span> 
             </div>
             `
@@ -684,9 +669,9 @@ export default class Timeline extends Component {
         this.setState({
             currentTime,
             renderData: this.computeDataToRender(currentTime, props.events),
-            events: props.events
+            events: props.events,
+            floors: props.floors
         })
-        console.log(props)
         if(!props.scroll) {
             this.filterEvents({
                 detail: {
