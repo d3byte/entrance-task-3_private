@@ -1,4 +1,6 @@
 import React, { Component } from 'react'
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
 
 import Header from '../../components/Header'
 import Leftbar from '../../components/Leftbar'
@@ -6,7 +8,7 @@ import Timeline from '../../components/Timeline'
 
 import emoji2 from '../../assets/img/emoji2.svg'
 
-export default class Main extends Component {
+class Main extends Component {
     constructor() {
         super()
         this.state = {
@@ -18,115 +20,7 @@ export default class Main extends Component {
         }
         this.screenWidth = window.screen.innerWidth || document.clientWidth || document.body.clientWidth
     }
-
-    fetchEvents = ms => {
-        const events = [
-            {
-                "id": "1",
-                "title": "ШРИ 2018 - начало",
-                "dateStart": "2017-12-28T12:16:23.309Z",
-                "dateEnd": "2017-12-28T14:57:23.309Z",
-                "users": [
-                { 
-                    "id": "3",
-                    "name": 'Дарт Вейдер',
-                    "floor": "1" 
-                },
-                {
-                    "id": "1",
-                    "name": 'Лекс Лютор',
-                    "floor": "7"
-                },
-                ],
-                "room": {
-                    "id": "1",
-                    "title": "404",
-                    "capacity": 5,
-                    "floor": 7
-                }
-            },
-            {
-                "id": "2",
-                "title": "👾 Хакатон 👾",
-                "dateStart": "2017-12-28T14:57:23.309Z",
-                "dateEnd": "2017-12-28T15:57:23.309Z",
-                "users": [
-                { 
-                    "id": "1",
-                    "name": 'Лекс Лютор',
-                    "floor": "7"
-                },
-                {   "id": "4",
-                    "name": 'Кларк Кент',
-                    "floor": "2" 
-                }
-                ],
-                "room": {
-                    "id": "2",
-                    "title": "Деньги",
-                    "capacity": 4,
-                    "floor": 6
-                }
-            },
-            {
-                "id": "3",
-                "title": "🍨 Пробуем kefir.js",
-                "dateStart": "2017-12-28T16:57:23.309Z",
-                "dateEnd": "2017-12-28T21:57:23.309Z",
-                "users": [
-                {
-                    "id": "3",
-                    "name": 'Дарт Вейдер',
-                    "floor": "1"
-                },
-                {
-                    "id": "4",
-                    "name": 'Кларк Кент',
-                    "floor": "2"
-                }
-                ],
-                "room": {
-                    "id": "3",
-                    "title": "Карты",
-                    "capacity": 4,
-                    "floor": 7
-                },
-            },
-            {
-                "id": "4",
-                "title": "Jjjjoо",
-                "dateStart": "2017-12-28T21:59:00.309Z",
-                "dateEnd": "2017-12-28T23:00:00.309Z",
-                "users": [
-                    {
-                        "id": "4",
-                        "name": 'Кларк Кент',
-                        "floor": "2"
-                    },
-                    {
-                        "id": "3",
-                        "name": 'Дарт Вейдер',
-                        "floor": "1"
-                    },
-                    {
-                        "id": "1",
-                        "name": 'Лекс Лютор',
-                        "floor": "7"
-                    },
-                ],
-                "room": {
-                    "id": "3",
-                    "title": "Карты",
-                    "capacity": 4,
-                    "floor": 7
-                }
-            }
-        ]
-        return new Promise((resolve, reject) => {
-            setTimeout(() => resolve(events), ms)
-        })
-    }
-
+    
     // Функция для преобразования данных типа Date в удобный мне формат
     splitDate = date => {
         return {
@@ -161,9 +55,11 @@ export default class Main extends Component {
                 room: {
                     id: event.room.id,
                     title: event.room.title,
-                    capacity: event.room.capacity
+                    capacity: event.room.capacity,
                 },
                 users: event.users,
+                dateStart: event.dateStart,
+                dateEnd: event.dateEnd,
                 start: this.splitDate(event.dateStart),
                 end: this.splitDate(event.dateEnd),
                 hoursIncluded: this.hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
@@ -204,16 +100,42 @@ export default class Main extends Component {
         }
     }
 
+    setFloors = rooms => {
+        let floorNums = rooms.map(room => room.floor)
+        // Избавляюсь от повторений номеров этажей и сортирую в порядке убывания
+        floorNums = [...new Set(floorNums)].sort((a, b) => {
+            if(a > b)
+                return -1
+            else if (a < b)
+                return 1
+        })
+
+        const floors = floorNums.map(floor => {
+            return {
+                num: floor,
+                rooms: rooms.filter(room => room.floor === floor)
+            }
+        })
+
+        this.setState({ floors })
+    }
+
     componentDidMount = () => {
         if (localStorage.success == 'true') {
             this.showModal()
         }
-            
-        this.fetchEvents(0).then(events => {
-            let newEvents = this.handleEventData(events)
-            this.setState({ events: newEvents })
-        })
     }
+
+    componentWillReceiveProps = props => {
+        const { fetchData } = props
+        if(fetchData) {
+            console.log(fetchData)
+            let newEvents = this.handleEventData(fetchData.events)
+            this.setState({ rooms: fetchData.rooms, events: newEvents, users: fetchData.users })
+            this.setFloors(fetchData.rooms)
+        }
+    }
+    
 
     render() {
         const { location, history } = this.props
@@ -232,11 +154,11 @@ export default class Main extends Component {
                 {
                     this.screenWidth <= 768 ? (
                         <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')} onScroll={this.handleScroll}>
-                            <Timeline history={history} events={this.state.events} scroll={this.state.scrolled} />
+                            <Timeline history={history} users={this.state.users} floors={this.state.floors} events={this.state.events} scroll={this.state.scrolled} />
                         </div>
                     ) : (
                         <div className={'right-bar ' + (this.state.scrolled ? 'scrolled' : '')}>
-                                    <Timeline history={history} events={this.state.events} scroll={this.state.scrolled} />
+                            <Timeline history={history} users={this.state.users} floors={this.state.floors} events={this.state.events} scroll={this.state.scrolled} />
                         </div>
                     )
                 }
@@ -266,3 +188,40 @@ export default class Main extends Component {
         )
     }
 }
+
+const FETCH_DATA = gql`
+    query FetchData {
+        rooms {
+            id
+            title
+            capacity
+            floor
+        }
+        users {
+            id
+            login
+            homeFloor
+            avatarUrl
+        }
+        events {
+            id
+            title
+            dateStart
+            dateEnd
+            users {
+                id
+                login
+                homeFloor
+                avatarUrl
+            }
+            room {
+                id
+                title
+                capacity
+                floor
+            }
+        }
+    }
+`
+
+export default graphql(FETCH_DATA, { name: 'fetchData' })(Main)
