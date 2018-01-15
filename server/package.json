@@ -15,13 +15,14 @@
     "dev": "nodemon index.js"
   },
   "dependencies": {
+    "cors": "^2.8.4",
     "express": "^4.15.4",
     "express-graphql": "^0.6.11",
     "graphql": "^0.11.1",
     "graphql-date": "^1.0.3",
     "graphql-tools": "^1.2.1",
     "sequelize": "^4.0.0",
-    "sqlite3": "^3.1.9"
+    "sqlite3": "^3.1.13"
   },
   "devDependencies": {
     "nodemon": "^1.12.5",
