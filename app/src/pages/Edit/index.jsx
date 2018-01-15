@@ -400,7 +400,7 @@ class Edit extends Component {
                                     <div className={`input-dropdown ${this.state.showUsers ? '' : 'hide'}`}>
                                         <ul className="people">
                                         {
-                                                this.state.users.map((user, key) => (
+                                            this.state.users.map((user, key) => (
                                                 <li 
                                                     className={`person p-${user.id} ${this.state.users[0].id == user.id ? 'suitable': ''}`} 
                                                     onClick={() => this.addUser(user)} key={key}

@@ -672,16 +672,16 @@ export default class Timeline extends Component {
             renderData: this.computeDataToRender(currentTime, props.events),
             events: props.events,
             floors: props.floors
+        }, () => {
+            if (!props.scroll) {
+                this.filterEvents({
+                    detail: {
+                        month: new Date().getMonth(),
+                        day: new Date().getDate()
+                    }
+                })
+            }
         })
-        if(!props.scroll) {
-            console.log('dju')
-            this.filterEvents({
-                detail: {
-                    month: new Date().getMonth(),
-                    day: new Date().getDate()
-                }
-            })
-        }
     }
 
     render = () => {

@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { graphql } from 'react-apollo'
+import gql from 'graphql-tag'
+import { compose } from 'react-apollo'
 
 import Header from '../../components/Header'
 import Calendar from '../../components/Calendar'
@@ -8,7 +11,7 @@ import close from '../../assets/img/close.svg'
 import calendar from '../../assets/img/calendar.svg'
 import closeWhite from '../../assets/img/close-white.svg'
 
-export default class New extends Component {
+class New extends Component {
     constructor() {
         super()
         this.state = {
@@ -16,25 +19,20 @@ export default class New extends Component {
             end: '',
             date: '',
             dateInput: '',
-            rooms: [
-                { id: 1, title: 'Ржавый Фред', capacity: '3-6 человек', floor: 7 },
-                { id: 2, title: 'Прачечная', capacity: 'До 10 человек', floor: 5 },
-                { id: 3, title: 'Жёлтый Дом', capacity: 'До 10 человек', floor: 3 },
-                { id: 4, title: 'Оранжевый тюльпан', capacity: 'До 10 человек', floor: 6 }
-            ],
+            rooms: [],
             room: null,
-            users: [
-                { "id": "1", "name": 'Лекс Лютор', "floor": "7" },
-                { "id": "2", "name": 'Томас Андерсон', "floor": "2" },
-                { "id": "3", "name": 'Дарт Вейдер', "floor": "1" },
-                { "id": "4", "name": 'Кларк Кент', "floor": "2" }
-            ],
+            users: [],
             invitedUsers: [],
             showUsers: false,
             theme: '',
             error_start: false,
-            error_end: false
+            error_end: false,
+            events: []
         }
+    }
+
+    getRecommendation = (rooms, info) => {
+
     }
 
     // Преобразую номер месяца в текстовый эквивалент
@@ -64,8 +62,15 @@ export default class New extends Component {
         
         const dateInput = `${day} ${this.monthNumToText(month)}, ${year}`
 
+        let newMonth
+        if (month + 1 < 10) {
+            newMonth = '0' + (month + 1)
+        } else {
+            newMonth = month + 1
+        }
+
         this.setState({
-            date: `${year}-${month}-${day}`,
+            date: `${year}-${newMonth}-${day}`,
             dateInput
         })
     }
@@ -87,31 +92,45 @@ export default class New extends Component {
     handleDateInput = e => {
         const { day, month, year } = e.detail,
             date = new Date()
-            
+
+
         if (day < date.getDate()) {
             // Оповестить пользователя, что нельзя ставить прошедшие даты
             console.log(false)
         }
-             
+
         const dateInput = `${day} ${this.monthNumToText(month)}, ${year}`
 
+        let newMonth
+        if (month + 1 < 10) {
+            newMonth = '0' + (month + 1)
+        } else {
+            newMonth = month + 1
+        }
+
         this.setState({
-            date: `${year}-${month}-${day}`,
+            date: `${year}-${newMonth}-${day}`,
             dateInput
         })
-
-        
     }
 
-    setPropsInfo = location => {
-        if(!location)
-            return
-        const { start, end, room } = location
-        this.setState({
-            start: start.hours + ':' + start.minutes,
-            end: end.hours + ':' + end.minutes,
-            room: room
-        })
+    setPropsInfo = (location, data) => {
+        if(location !== undefined) {
+            const { start, end, room } = location
+            this.setState({
+                start: start.hours + ':' + start.minutes,
+                end: end.hours + ':' + end.minutes,
+                room: room,
+            })
+        }
+        if(data !== undefined) {
+            const { users, rooms, events } = data
+            this.setState({
+                users,
+                rooms,
+                events
+            })
+        }
     }
 
     chooseRoom = room => {
@@ -126,7 +145,7 @@ export default class New extends Component {
         const text = e.target.value
         if (text !== '') {
             var suitableUser = this.state.users.map(user => {
-                if (user.name.indexOf(text) !== -1) {
+                if (user.login.indexOf(text) !== -1) {
                     return user
                 }
             })
@@ -143,18 +162,14 @@ export default class New extends Component {
         let invitedUsers = this.state.invitedUsers.slice(0),
             users = this.state.users.slice(0).filter(item => item != user)
         invitedUsers.push(user)
-        this.setState({ users, invitedUsers, showUsers: false })
-        // Создаю эвент об успешном добавлении
-        // const personAdded = new Event('person-added')
-        // document.dispatchEvent(personAdded)
-        // document.querySelector('.input-dropdown').classList.add('hide')
+        this.setState({ users, invitedUsers, showUsers: false, updated: false })
     }
 
     removeUser = user => {
         let invitedUsers = this.state.invitedUsers.slice(0).filter(invitedUser => invitedUser.id != user.id),
             users = this.state.users.slice(0)
         users.push(user)
-        this.setState({ users, invitedUsers })
+        this.setState({ users, invitedUsers, updated: false })
     }
 
     showUserList = () => {
@@ -196,15 +211,27 @@ export default class New extends Component {
     }
 
     submit = () => {
-        localStorage.setItem('success', 'true')
-        localStorage.setItem(
-            'info', 
-            JSON.stringify({ 
-                date: this.state.dateInput.slice(0, this.state.dateInput.length - 5) + ' ' + this.state.start + '–' + this.state.end,
-                room: this.state.room
-            })
-        )
-        this.props.history.push('/')
+        const input = {
+            title: this.state.theme,
+            dateStart: this.state.date + 'T' + this.state.start + ':00.309Z',
+            dateEnd: this.state.date + 'T' + this.state.end + ':00.309Z'
+        }
+
+        const usersIds = this.state.invitedUsers.map(user => user.id)
+        const roomId = this.state.room.id
+
+        this.props.createEvent({ variables: { input, usersIds, roomId } }).then(data => {
+            localStorage.setItem('success', 'true')
+            localStorage.setItem(
+                'info',
+                JSON.stringify({
+                    date: this.state.dateInput.slice(0, this.state.dateInput.length - 5) + ' ' + this.state.start + '–' + this.state.end,
+                    room: this.state.room
+                })
+            )
+            this.props.history.push('/')
+        }).catch(error => console.log('there was an error sending the query', error))
+        
     }
 
     componentDidMount = () => {
@@ -217,6 +244,11 @@ export default class New extends Component {
     componentWillUnmount = () => {
         document.removeEventListener('new-date', this.handleDateInput)
     }
+
+    componentWillReceiveProps = props => {
+        this.setPropsInfo(props.location.state, props.fetchData)
+    }
+    
     
     
     render() {
@@ -284,13 +316,13 @@ export default class New extends Component {
                                     <div className={`input-dropdown ${this.state.showUsers ? '' : 'hide'}`}>
                                         <ul className="people">
                                         {
-                                                this.state.users.map((user, key) => (
+                                            this.state.users.map((user, key) => (
                                                 <li 
                                                     className={`person p-${user.id} ${this.state.users[0].id == user.id ? 'suitable': ''}`} 
                                                     onClick={() => this.addUser(user)} key={key}
                                                 >
-                                                    <img src={close} className="avatar"/>
-                                                    <span className="name">{user.name}</span>
+                                                    <img src={user.avatarUrl} className="avatar"/>
+                                                    <span className="name">{user.login}</span>
                                                     <span className="dot">&#183;</span>
                                                     <span className="floor">{user.floor} этаж</span>
                                                 </li>
@@ -303,8 +335,8 @@ export default class New extends Component {
                                         this.state.invitedUsers && this.state.invitedUsers.map((user, key) => (
                                             <div key={key} className={`invited-person p-${user.id}`}>
                                                 <div className="person-wrapper">
-                                                    <img src={closeWhite} className="avatar"/>
-                                                    {user.name}
+                                                    <img src={user.avatarUrl} className="avatar"/>
+                                                    {user.login}
                                                 </div>
                                                 <img 
                                                     onClick={() => this.removeUser(user)}
@@ -379,3 +411,54 @@ export default class New extends Component {
         )
     }
 }
+
+const CREATE_EVENT = gql`
+  mutation createEvent($input: EventInput!, $usersIds: [ID], $roomId: ID!) {
+    createEvent(input: $input, usersIds: $usersIds, roomId: $roomId) {
+        id
+    }
+  }
+`
+
+const FETCH_DATA = gql`
+query users {
+    users {
+        id
+        login
+        avatarUrl
+        homeFloor
+    }
+    rooms {
+        id
+        title
+        capacity
+        floor
+    }
+    events {
+        id
+        title
+        dateStart
+        dateEnd
+        users {
+            id
+            login
+            homeFloor
+            avatarUrl
+        }
+        room {
+            id
+            title
+            capacity
+            floor
+        }
+    }
+}
+`
+
+const NewComponent = compose(
+    graphql(CREATE_EVENT, { name: 'createEvent' }),
+    graphql(FETCH_DATA, { name: 'fetchData' }),
+)(New)
+
+// 3
+export default NewComponent
