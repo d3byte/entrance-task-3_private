@@ -11,11 +11,11 @@ export default class Floor extends Component {
                 <div className="floor-num">{floor} этаж</div>
                 <ul className="rooms">
                     {
-                        rooms.map((room, key) => (
+                        rooms && rooms.map((room, key) => (
                             <li key={key} className={'room r-' + room.id}>
                                 <span className="title">{room.title}</span>
                                 <br />
-                                <span className="capacity">{room.capacity}</span>
+                                <span className="capacity">До {room.capacity} человек</span>
                             </li>
                         ))
                     }
