@@ -664,6 +664,7 @@ export default class Timeline extends Component {
     }
 
     componentWillReceiveProps = props => {
+        console.log(props)
         const currentTime = this.determineTime()
         this.addStyle(currentTime)
         this.setState({
@@ -673,6 +674,7 @@ export default class Timeline extends Component {
             floors: props.floors
         })
         if(!props.scroll) {
+            console.log('dju')
             this.filterEvents({
                 detail: {
                     month: new Date().getMonth(),

@@ -379,14 +379,6 @@ export default class Calendar extends Component {
                     this.prevDay([previousMonth, currentMonth, nextMonth])
                 })
             }
-            
-            document.querySelector('.left-bar .date h5')
-            document.querySelector('.left-bar .date .next').addEventListener('click', () => {
-                this.nextDay([previousMonth, currentMonth, nextMonth])
-            })
-            document.querySelector('.left-bar .date .previous').addEventListener('click', () => {
-                this.prevDay([previousMonth, currentMonth, nextMonth])
-            })
         })
         
         }
