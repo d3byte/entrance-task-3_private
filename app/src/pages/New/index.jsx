@@ -31,10 +31,6 @@ class New extends Component {
         }
     }
 
-    getRecommendation = (rooms, info) => {
-
-    }
-
     // Преобразую номер месяца в текстовый эквивалент
     monthNumToText = number => {
         const months = [
@@ -46,47 +42,20 @@ class New extends Component {
         return months[number]
     }
 
-    setTodayDate = () => {
-        let date = new Date(),
-            day = date.getDate(),
-            month = date.getMonth(),
-            year = date.getFullYear()
-
-        if (month === -1) {
-            year -= 1
-            month = 11
-        } else if (month === 13) {
-            year += 1
-            month = 0
-        }
-        
-        const dateInput = `${day} ${this.monthNumToText(month)}, ${year}`
-
-        let newMonth
-        if (month + 1 < 10) {
-            newMonth = '0' + (month + 1)
-        } else {
-            newMonth = month + 1
-        }
-
-        this.setState({
-            date: `${year}-${newMonth}-${day}`,
-            dateInput
-        })
-    }
-
     handleThemeInput = e => {
         this.setState({ theme: e.target.value })
     }
 
     handleTimeInput = (e, field) => {
-        if (e.target.value.length === 2 && this.state.start.length !== 3) {
+        if (e.target.value.length === 5 && this.state.start.length === 5 || e.target.value.length === 5 && this.state.end.length === 5) {
+            this.setState({ [field]: e.target.value }, this.getRecommendation)
+        } else if (e.target.value.length === 2 && this.state.start.length !== 3) {
             e.target.value = e.target.value + ':'
-            this.setState({ [field]: e.target.value })
+            this.setState({ [field]: e.target.value, updated: false })
         } else if (e.target.value.length < 6) {
-            this.setState({ [field]: e.target.value })
+            this.setState({ [field]: e.target.value, updated: false })
         }
-        
+
     }
 
     handleDateInput = e => {
@@ -110,8 +79,224 @@ class New extends Component {
 
         this.setState({
             date: `${year}-${newMonth}-${day}`,
-            dateInput
+            dateInput,
+            updated: false,
+        }, () => {
+            this.filterEvents({ detail: { day, month: parseInt(month) } })
+            this.getRecommendation()
         })
+    }
+
+    // Функция для преобразования данных типа Date в удобный мне формат
+    splitDate = date => {
+        return {
+            year: date.slice(0, 4),
+            month: date.slice(5, 7),
+            day: date.slice(8, 10),
+            time: {
+                hours: date.slice(11, 13),
+                minutes: date.slice(14, 16),
+                seconds: date.slice(17, 19),
+            },
+        }
+    }
+
+    // Функция для высчитывания часов, затронутых эвентом
+    hoursIncluded = (start, end) => {
+        let hours = []
+        for (var i = start; i <= end; i++) {
+            // eslint-disable-next-line
+            hours.push(parseInt(i))
+        }
+        return hours
+    }
+
+    handleEventData = data => {
+        let newData = data.map(event => {
+            return {
+                id: event.id,
+                title: event.title,
+                floor: event.room.floor,
+                room: {
+                    id: event.room.id,
+                    title: event.room.title,
+                    capacity: event.room.capacity,
+                },
+                users: event.users,
+                dateStart: event.dateStart,
+                dateEnd: event.dateEnd,
+                start: this.splitDate(event.dateStart),
+                end: this.splitDate(event.dateEnd),
+                hoursIncluded: this.hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
+            }
+        })
+        return newData
+    }
+
+    filterEvents = e => {
+        // eslint-disable-next-line
+        let newEvents = this.state.events.slice(0)
+        newEvents = newEvents.map(event => {
+            const month = event.start.month,
+                day = event.start.day
+            // eslint-disable-next-line
+            if (e && e.detail && month == (e.detail.month + 1) && day == e.detail.day)
+                return event
+        }).filter(item => item !== undefined)
+        this.setState({ todayEvents: this.handleEventData(newEvents) })
+    }
+
+    getRecommendation = () => {
+        // Отсеять комнаты, где недостаточно места для участников
+        if (this.state.todayEvents && !this.state.room) {
+            console.log('aaa')
+            let roomsWithEnoughCapacity = this.state.rooms.filter(room => room.capacity >= this.state.invitedUsers.length)
+            let rooms = [],
+                { start, end } = this.state,
+                availableRooms = roomsWithEnoughCapacity.filter(room => {
+                    // Отобрать только свободные комнаты
+                    let time = { hours: 0, taken: [] },
+                        events = []
+                    this.state.todayEvents.map(event => {
+                        if (event.room.id === room.id) {
+                            time.hours += event.hoursIncluded.length
+                            time.taken.push({ start: event.start, end: event.end, hoursIncluded: event.hoursIncluded })
+                            events.push(event)
+                        }
+                    })
+                    let roomSuits = true
+                    if (time.hours !== 24) {
+                        time.taken.map(item => {
+                            // Если первый час эвента равен часу окончания
+                            if (item.hoursIncluded[0] == parseInt(end.slice(0, 2))) {
+                                if (item.start.time.minutes < parseInt(end.slice(3, 5))) {
+                                    roomSuits = false
+                                }
+                            }
+                            // Если последний час эвента равен часу начала
+                            if (item.hoursIncluded[item.hoursIncluded.length - 1] == parseInt(start.slice(0, 2))) {
+                                if (item.end.time.minutes < parseInt(start.slice(3, 5))) {
+                                    roomSuits = false
+                                }
+                            }
+                            // Проверить остальные часы
+                            if (item.hoursIncluded[item.hoursIncluded.length - 1] != parseInt(start.slice(0, 2)) &&
+                                item.hoursIncluded[0] != parseInt(start.slice(0, 2)) &&
+                                item.hoursIncluded.includes(parseInt(start.slice(0, 2))) ||
+                                item.hoursIncluded[item.hoursIncluded.length - 1] != parseInt(end.slice(0, 2)) &&
+                                item.hoursIncluded[0] != parseInt(end.slice(0, 2)) &&
+                                item.hoursIncluded.includes(parseInt(end.slice(0, 2)))) {
+                                roomSuits = false
+                            }
+
+                        })
+                        // делать что-то
+                    } else roomSuits = false
+
+                    if (!roomSuits)
+                        rooms.push({ time, room, events })
+
+                    return roomSuits ? room : undefined
+                }).filter(item => item !== undefined)
+            // Подсчитать общее количество пройденных этажей юзерами в каждую комнату  
+            // И сформировать удобную структуру данных
+            let suitableRooms = []
+            availableRooms.map(room => {
+                let floorsAmount = 0
+                this.state.invitedUsers.map(user => floorsAmount += Math.abs(user.homeFloor - room.floor))
+                suitableRooms.push({ floorsAmount, room })
+            })
+            // Отсортировать комнаты
+            suitableRooms.sort((a, b) => {
+                if (a.floorsAmount < b.floorsAmount)
+                    return -1
+                else return 1
+            })
+
+            // Если есть доступные переговорки
+            suitableRooms = suitableRooms.map(room => room.room)
+            if (suitableRooms.length > 0) {
+                console.log(suitableRooms)
+                this.setState({ recommendedRooms: suitableRooms })
+            } else {
+                let foundRoom = false
+                rooms.map((item, index) => {
+                    // Если комната не занята целые сутки
+                    if (!foundRoom) {
+                        item.events.map(event => {
+                            let crossesTime = false
+                            for (let hour = parseInt(start.slice(0, 2)); hour <= parseInt(end.slice(0, 2)); hour++) {
+                                if (event.hoursIncluded.includes(hour)) {
+                                    crossesTime = true
+                                    break
+                                }
+                            }
+                            if (crossesTime) {
+                                let roomsWithEnoughCapacity = this.state.rooms.filter(room => room.capacity >= event.users.length),
+                                    availableRooms = roomsWithEnoughCapacity.filter(room => {
+                                        // Отобрать только свободные комнаты
+                                        let time = { hours: 0, taken: [] }
+                                        this.state.todayEvents.map(item => {
+                                            if (item.room.id === room.id) {
+                                                time.hours += item.hoursIncluded.length
+                                                time.taken.push({ start: item.start, end: item.end, hoursIncluded: item.hoursIncluded })
+                                            }
+                                        })
+                                        let roomSuits = true
+                                        if (time.hours !== 24) {
+                                            time.taken.map(item => {
+                                                // Если первый час эвента равен часу окончания
+                                                if (item.hoursIncluded[0] == event.end.time.hours) {
+                                                    if (item.start.time.minutes < event.end.time.minutes) {
+                                                        roomSuits = false
+                                                    }
+                                                }
+                                                // Если последний час эвента равен часу начала
+                                                if (item.hoursIncluded[item.hoursIncluded.length - 1] == event.start.time.hours) {
+                                                    if (item.end.time.minutes < event.start.time.minutes) {
+                                                        roomSuits = false
+                                                    }
+                                                }
+                                                // Проверить остальные часы
+                                                if (item.hoursIncluded[item.hoursIncluded.length - 1] == event.start.time.hours &&
+                                                    item.hoursIncluded[0] == event.start.time.hours &&
+                                                    item.hoursIncluded.includes(event.start.time.hours) ||
+                                                    item.hoursIncluded[item.hoursIncluded.length - 1] == event.end.time.hours &&
+                                                    item.hoursIncluded[0] == event.end.time.hours &&
+                                                    item.hoursIncluded.includes(event.end.time.hours)) {
+                                                    roomSuits = false
+                                                }
+
+                                            })
+                                            // делать что-то
+                                        } else roomSuits = false
+
+                                        return roomSuits ? room : undefined
+                                    }).filter(item => item !== undefined)
+                                let suitableRooms = []
+                                availableRooms.map(room => {
+                                    let floorsAmount = 0
+                                    event.users.map(user => floorsAmount += Math.abs(user.homeFloor - room.floor))
+                                    suitableRooms.push({ floorsAmount, room })
+                                })
+                                // Отсортировать комнаты
+                                suitableRooms.sort((a, b) => {
+                                    if (a.floorsAmount < b.floorsAmount)
+                                        return -1
+                                    else return 1
+                                })
+                                // Если есть доступные переговорки
+                                suitableRooms = suitableRooms.map(room => room.room)
+                                this.props.changeEventRoom({ variables: { id: event.id, roomId: suitableRooms[0].id } }).then(data => {
+                                    this.setState({ recommendedRooms: [item.room] })
+                                    foundRoom = true
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        }
     }
 
     setPropsInfo = (location, data) => {
@@ -125,11 +310,17 @@ class New extends Component {
         }
         if(data !== undefined) {
             const { users, rooms, events } = data
+            console.log(events)
             this.setState({
                 users,
                 rooms,
-                events
+                events: this.handleEventData(events)
             })
+            const date = new Date(),
+                day = date.getDate(),
+                month = date.getMonth(),
+                year = date.getFullYear()
+            this.handleDateInput({ detail: { day, month, year } })
         }
     }
 
@@ -138,7 +329,7 @@ class New extends Component {
     }
 
     cancelRoom = () => {
-        this.setState({ room: null })
+        this.setState({ room: null, updated: false }, this.getRecommendation)
     }
 
     userInputHandler = e => {
@@ -162,14 +353,14 @@ class New extends Component {
         let invitedUsers = this.state.invitedUsers.slice(0),
             users = this.state.users.slice(0).filter(item => item != user)
         invitedUsers.push(user)
-        this.setState({ users, invitedUsers, showUsers: false, updated: false })
+        this.setState({ users, invitedUsers, showUsers: false, updated: false }, this.getRecommendation)
     }
 
     removeUser = user => {
         let invitedUsers = this.state.invitedUsers.slice(0).filter(invitedUser => invitedUser.id != user.id),
             users = this.state.users.slice(0)
         users.push(user)
-        this.setState({ users, invitedUsers, updated: false })
+        this.setState({ users, invitedUsers, updated: false }, this.getRecommendation)
     }
 
     showUserList = () => {
@@ -237,7 +428,6 @@ class New extends Component {
     componentDidMount = () => {
         if(this.props && this.props.location)
             this.setPropsInfo(this.props.location.state)
-        this.setTodayDate()
         document.addEventListener('new-date', this.handleDateInput)
     }
 
@@ -355,7 +545,7 @@ class New extends Component {
                                             <div className="labeled-room list">
                                                 <label>Рекомендованные переговорки</label>
                                                 {
-                                                    this.state.rooms.map((room, key) => (
+                                                    this.state.recommendedRooms && this.state.recommendedRooms.map((room, key) => (
                                                         <div key={key} className="room" onClick={() => this.chooseRoom(room)}>
                                                             <div className="info">
                                                                 <span className="time">{this.state.start}–{this.state.end}</span>
@@ -455,9 +645,33 @@ query users {
 }
 `
 
+const CHANGE_ROOM = gql`
+mutation changeRoom($id: ID!, $roomId: ID!) {
+    changeEventRoom(id: $id, roomId: $roomId) {
+        id
+        title
+        dateStart
+        dateEnd
+        users {
+            id
+            login
+            homeFloor
+            avatarUrl
+        }
+        room {
+            id
+            title
+            capacity
+            floor
+        }
+    }
+}
+`
+
 const NewComponent = compose(
     graphql(CREATE_EVENT, { name: 'createEvent' }),
     graphql(FETCH_DATA, { name: 'fetchData' }),
+    graphql(CHANGE_ROOM, { name: 'changeEventRoom' })
 )(New)
 
 // 3

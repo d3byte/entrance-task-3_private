@@ -185,19 +185,21 @@ class Edit extends Component {
         // Отсеять комнаты, где недостаточно места для участников
         if(this.state.todayEvents && !this.state.room) {
             let roomsWithEnoughCapacity = this.state.rooms.filter(room => room.capacity >= this.state.invitedUsers.length)
-            let availableRooms = roomsWithEnoughCapacity.filter(room => {
+            let rooms = [],
+            { start, end } = this.state,
+            availableRooms = roomsWithEnoughCapacity.filter(room => {
                 // Отобрать только свободные комнаты
-                let time = { hours: 0, taken: [] }
+                let time = { hours: 0, taken: [] },
+                    events = []
                 this.state.todayEvents.map(event => {
-                    if (event.room.id== room.id) {
+                    if (event.room.id === room.id) {
                         time.hours += event.hoursIncluded.length
                         time.taken.push({ start: event.start, end: event.end, hoursIncluded: event.hoursIncluded })
+                        events.push(event)
                     }
                 })
                 let roomSuits = true
                 if (time.hours !== 24) {
-                    const { start, end } = this.state
-                    console.log(end.slice(0, 2), end.slice(3, 5))
                     time.taken.map(item => {
                         // Если первый час эвента равен часу окончания
                         if (item.hoursIncluded[0] == parseInt(end.slice(0, 2))) {
@@ -213,22 +215,20 @@ class Edit extends Component {
                         }
                         // Проверить остальные часы
                         if (item.hoursIncluded[item.hoursIncluded.length - 1] != parseInt(start.slice(0, 2)) &&
-                            item.hoursIncluded[0] != parseInt(end.slice(0, 2)) &&
+                            item.hoursIncluded[0] != parseInt(start.slice(0, 2)) &&
                             item.hoursIncluded.includes(parseInt(start.slice(0, 2))) ||
                             item.hoursIncluded[item.hoursIncluded.length - 1] != parseInt(end.slice(0, 2)) &&
                             item.hoursIncluded[0] != parseInt(end.slice(0, 2)) &&
                             item.hoursIncluded.includes(parseInt(end.slice(0, 2)))) {
                             roomSuits = false
                         }
+
                     })
                     // делать что-то
                 } else roomSuits = false
 
-                if(room.id == 4) {
-                    console.log('Ствола', room, time)
-                }
-
-                console.log(`Room suits: ${roomSuits}`, room)
+                if(!roomSuits)
+                    rooms.push({ time, room, events })
 
                 return roomSuits ? room : undefined
             }).filter(item => item !== undefined)
@@ -246,10 +246,89 @@ class Edit extends Component {
                     return -1
                 else return 1
             })
-            console.log('Рекомендованные переговорки: ', suitableRooms)
+            
+            // Если есть доступные переговорки
             suitableRooms = suitableRooms.map(room => room.room)
-            console.log('После отчистки: ', suitableRooms)
-            this.setState({ recommendedRooms: suitableRooms })
+            if(suitableRooms.length > 0) {
+                this.setState({ recommendedRooms: suitableRooms })
+            } else {
+                let foundRoom = false
+                rooms.map((item, index) => {
+                    // Если комната не занята целые сутки
+                    if(!foundRoom) {
+                        item.events.map(event => {
+                            let crossesTime = false
+                            for (let hour = parseInt(start.slice(0, 2)); hour <= parseInt(end.slice(0, 2)); hour++) {
+                                if(event.hoursIncluded(hour)) {
+                                    crossesTime = true
+                                    break
+                                }
+                            }
+                            if(crossesTime) {
+                                let roomsWithEnoughCapacity = this.state.rooms.filter(room => room.capacity >= event.users.length),
+                                availableRooms = roomsWithEnoughCapacity.filter(room => {
+                                    // Отобрать только свободные комнаты
+                                    let time = { hours: 0, taken: [] }
+                                    this.state.todayEvents.map(item => {
+                                        if (item.room.id === room.id) {
+                                            time.hours += item.hoursIncluded.length
+                                            time.taken.push({ start: item.start, end: item.end, hoursIncluded: item.hoursIncluded })
+                                        }
+                                    })
+                                    let roomSuits = true
+                                    if (time.hours !== 24) {
+                                        time.taken.map(item => {
+                                            // Если первый час эвента равен часу окончания
+                                            if (item.hoursIncluded[0] == event.end.time.hours) {
+                                                if (item.start.time.minutes < event.end.time.minutes) {
+                                                    roomSuits = false
+                                                }
+                                            }
+                                            // Если последний час эвента равен часу начала
+                                            if (item.hoursIncluded[item.hoursIncluded.length - 1] == event.start.time.hours) {
+                                                if (item.end.time.minutes < event.start.time.minutes) {
+                                                    roomSuits = false
+                                                }
+                                            }
+                                            // Проверить остальные часы
+                                            if (item.hoursIncluded[item.hoursIncluded.length - 1] == event.start.time.hours &&
+                                                item.hoursIncluded[0] == event.start.time.hours &&
+                                                item.hoursIncluded.includes(event.start.time.hours) ||
+                                                item.hoursIncluded[item.hoursIncluded.length - 1] == event.end.time.hours &&
+                                                item.hoursIncluded[0] == event.end.time.hours &&
+                                                item.hoursIncluded.includes(event.end.time.hours)) {
+                                                roomSuits = false
+                                            }
+
+                                        })
+                                        // делать что-то
+                                    } else roomSuits = false
+
+                                    return roomSuits ? room : undefined
+                                }).filter(item => item !== undefined)
+                                let suitableRooms = []
+                                availableRooms.map(room => {
+                                    let floorsAmount = 0
+                                    event.users.map(user => floorsAmount += Math.abs(user.homeFloor - room.floor))
+                                    suitableRooms.push({ floorsAmount, room })
+                                })
+                                // Отсортировать комнаты
+                                suitableRooms.sort((a, b) => {
+                                    if (a.floorsAmount < b.floorsAmount)
+                                        return -1
+                                    else return 1
+                                })
+                                // Если есть доступные переговорки
+                                suitableRooms = suitableRooms.map(room => room.room)
+                                this.props.changeEventRoom({ variables: { id: event.id, roomId: suitableRooms[0].id } }).then(data => {
+                                    this.setState({ recommendedRooms: [item.room] })
+                                    foundRoom = true
+                                })
+                            }
+                        })
+                    }
+                })
+            }
         }
     }
 
@@ -288,7 +367,7 @@ class Edit extends Component {
     }
 
     cancelRoom = () => {
-        this.setState({ room: null, updated: false }, () => this.getRecommendation())
+        this.setState({ room: null, updated: false }, this.getRecommendation)
     }
 
     userInputHandler = e => {
