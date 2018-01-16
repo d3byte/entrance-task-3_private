@@ -125,6 +125,7 @@ export default class Timeline extends Component {
             document.removeEventListener('click', e => this.goTo(e, event))
             this.props.history.push({ pathname: '/edit', state: {
                 ...event,
+                events: this.state.events,
                 allUsers: this.props.users,
                 floors: this.props.floors
             }})
@@ -133,7 +134,6 @@ export default class Timeline extends Component {
 
     // Основная функция, создающая тултип
     createTooltip = (e, event) => {
-        console.log(event)
         document.removeEventListener('click', e => this.goTo(e, event))
         if(e.target.classList.contains(`e-${event.id}`)) {
             this.removePreviousTooltip()
@@ -664,7 +664,6 @@ export default class Timeline extends Component {
     }
 
     componentWillReceiveProps = props => {
-        console.log(props)
         const currentTime = this.determineTime()
         this.addStyle(currentTime)
         this.setState({

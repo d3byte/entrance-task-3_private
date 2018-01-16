@@ -27,6 +27,7 @@ class Edit extends Component {
             room: null,
             users: [],
             invitedUsers: [],
+            events: [],
             showUsers: false,
             theme: '',
             error_start: false,
@@ -62,11 +63,18 @@ class Edit extends Component {
         
         const dateInput = `${day} ${this.monthNumToText(month)}, ${year}`
 
+        this.filterEvents({
+            detail: {
+                month: new Date().getMonth(),
+                day: new Date().getDate()
+            }
+        })
+
         this.setState({
             date: `${year}-${month}-${day}`,
             dateInput,
             updated: false
-        })
+        }, () => this.getRecommendation())
     }
 
     handleThemeInput = e => {
@@ -74,7 +82,9 @@ class Edit extends Component {
     }
 
     handleTimeInput = (e, field) => {
-        if (e.target.value.length === 2 && this.state.start.length !== 3) {
+        if (e.target.value.length === 5 && this.state.start.length === 5 || e.target.value.length === 5 && this.state.end.length === 5) {
+            this.setState({ [field]: e.target.value }, this.getRecommendation)
+        } else if (e.target.value.length === 2 && this.state.start.length !== 3) {
             e.target.value = e.target.value + ':'
             this.setState({ [field]: e.target.value, updated: false })
         } else if (e.target.value.length < 6) {
@@ -105,18 +115,148 @@ class Edit extends Component {
         this.setState({
             date: `${year}-${newMonth}-${day}`,
             dateInput,
-            updated: false
+            updated: false,
+        }, () => {
+            this.filterEvents({ detail: { day, month: parseInt(month) } })
+            this.getRecommendation()
         })
     }
-    
-    getRecommendation = (rooms, info) => {
 
+    // Функция для преобразования данных типа Date в удобный мне формат
+    splitDate = date => {
+        return {
+            year: date.slice(0, 4),
+            month: date.slice(5, 7),
+            day: date.slice(8, 10),
+            time: {
+                hours: date.slice(11, 13),
+                minutes: date.slice(14, 16),
+                seconds: date.slice(17, 19),
+            },
+        }
+    }
+
+    // Функция для высчитывания часов, затронутых эвентом
+    hoursIncluded = (start, end) => {
+        let hours = []
+        for (var i = start; i <= end; i++) {
+            // eslint-disable-next-line
+            hours.push(parseInt(i))
+        }
+        return hours
+    }
+
+    handleEventData = data => {
+        let newData = data.map(event => {
+            return {
+                id: event.id,
+                title: event.title,
+                floor: event.room.floor,
+                room: {
+                    id: event.room.id,
+                    title: event.room.title,
+                    capacity: event.room.capacity,
+                },
+                users: event.users,
+                dateStart: event.dateStart,
+                dateEnd: event.dateEnd,
+                start: this.splitDate(event.dateStart),
+                end: this.splitDate(event.dateEnd),
+                hoursIncluded: this.hoursIncluded(event.dateStart.slice(11, 13), event.dateEnd.slice(11, 13))
+            }
+        })
+        return newData
+    }
+
+    filterEvents = e => {
+        // eslint-disable-next-line
+        let newEvents = this.state.events.slice(0)
+        newEvents = newEvents.map(event => {
+            const month = event.start.month,
+                day = event.start.day
+            // eslint-disable-next-line
+            if (e && e.detail && month == (e.detail.month + 1) && day == e.detail.day)
+                return event
+        }).filter(item => item !== undefined)
+        this.setState({ todayEvents: this.handleEventData(newEvents) })
+    }
+
+    getRecommendation = () => {
+        // Отсеять комнаты, где недостаточно места для участников
+        if(this.state.todayEvents && !this.state.room) {
+            let roomsWithEnoughCapacity = this.state.rooms.filter(room => room.capacity >= this.state.invitedUsers.length)
+            let availableRooms = roomsWithEnoughCapacity.filter(room => {
+                // Отобрать только свободные комнаты
+                let time = { hours: 0, taken: [] }
+                this.state.todayEvents.map(event => {
+                    if (event.room.id== room.id) {
+                        time.hours += event.hoursIncluded.length
+                        time.taken.push({ start: event.start, end: event.end, hoursIncluded: event.hoursIncluded })
+                    }
+                })
+                let roomSuits = true
+                if (time.hours !== 24) {
+                    const { start, end } = this.state
+                    console.log(end.slice(0, 2), end.slice(3, 5))
+                    time.taken.map(item => {
+                        // Если первый час эвента равен часу окончания
+                        if (item.hoursIncluded[0] == parseInt(end.slice(0, 2))) {
+                            if (item.start.time.minutes < parseInt(end.slice(3, 5))) {
+                                roomSuits = false
+                            }
+                        }
+                        // Если последний час эвента равен часу начала
+                        if (item.hoursIncluded[item.hoursIncluded.length - 1] == parseInt(start.slice(0, 2))) {
+                            if (item.end.time.minutes < parseInt(start.slice(3, 5))) {
+                                roomSuits = false
+                            }
+                        }
+                        // Проверить остальные часы
+                        if (item.hoursIncluded[item.hoursIncluded.length - 1] != parseInt(start.slice(0, 2)) &&
+                            item.hoursIncluded[0] != parseInt(end.slice(0, 2)) &&
+                            item.hoursIncluded.includes(parseInt(start.slice(0, 2))) ||
+                            item.hoursIncluded[item.hoursIncluded.length - 1] != parseInt(end.slice(0, 2)) &&
+                            item.hoursIncluded[0] != parseInt(end.slice(0, 2)) &&
+                            item.hoursIncluded.includes(parseInt(end.slice(0, 2)))) {
+                            roomSuits = false
+                        }
+                    })
+                    // делать что-то
+                } else roomSuits = false
+
+                if(room.id == 4) {
+                    console.log('Ствола', room, time)
+                }
+
+                console.log(`Room suits: ${roomSuits}`, room)
+
+                return roomSuits ? room : undefined
+            }).filter(item => item !== undefined)
+            // Подсчитать общее количество пройденных этажей юзерами в каждую комнату  
+            // И сформировать удобную структуру данных
+            let suitableRooms = []
+            availableRooms.map(room => {
+                let floorsAmount = 0
+                this.state.invitedUsers.map(user => floorsAmount += Math.abs(user.homeFloor - room.floor))
+                suitableRooms.push({ floorsAmount, room })
+            })
+            // Отсортировать комнаты
+            suitableRooms.sort((a, b) => {
+                if (a.floorsAmount < b.floorsAmount)
+                    return -1
+                else return 1
+            })
+            console.log('Рекомендованные переговорки: ', suitableRooms)
+            suitableRooms = suitableRooms.map(room => room.room)
+            console.log('После отчистки: ', suitableRooms)
+            this.setState({ recommendedRooms: suitableRooms })
+        }
     }
 
     setPropsInfo = location => {
         if(!location)
             return
-        const { start, end, room, id, title, users, allUsers, floor, floors } = location
+        const { start, end, room, id, title, users, allUsers, floor, floors, events } = location
         let newUsers = allUsers.slice(0).filter(user => {
             let isUsed = false
             users.map(item => {
@@ -137,7 +277,8 @@ class Edit extends Component {
             theme: title,
             floor,
             invitedUsers: users,
-            users: newUsers
+            users: newUsers,
+            events  
         })
         this.handleDateInput({ detail: { day: start.day, month: parseInt(start.month) - 1, year: start.year } })
     }
@@ -147,7 +288,7 @@ class Edit extends Component {
     }
 
     cancelRoom = () => {
-        this.setState({ room: null, updated: false })
+        this.setState({ room: null, updated: false }, () => this.getRecommendation())
     }
 
     userInputHandler = e => {
@@ -171,14 +312,14 @@ class Edit extends Component {
         let invitedUsers = this.state.invitedUsers.slice(0),
             users = this.state.users.slice(0).filter(item => item != user)
         invitedUsers.push(user)
-        this.setState({ users, invitedUsers, showUsers: false, updated: false })
+        this.setState({ users, invitedUsers, showUsers: false, updated: false }, () => this.getRecommendation())
     }
 
     removeUser = user => {
         let invitedUsers = this.state.invitedUsers.slice(0).filter(invitedUser => invitedUser.id != user.id),
             users = this.state.users.slice(0)
         users.push(user)
-        this.setState({ users, invitedUsers, updated: false })
+        this.setState({ users, invitedUsers, updated: false }, () => this.getRecommendation())
     }
 
     showUserList = () => {
@@ -326,10 +467,12 @@ class Edit extends Component {
         if(this.props && this.props.location)
             this.setPropsInfo(this.props.location.state)
         document.addEventListener('new-date', this.handleDateInput)
+        document.addEventListener('filter-events', this.filterEvents)
     }
 
     componentWillUnmount = () => {
         document.removeEventListener('new-date', this.handleDateInput)
+        document.removeEventListener('filter-events', this.filterEvents)
     }
     
     
@@ -439,7 +582,7 @@ class Edit extends Component {
                                             <div className="labeled-room list">
                                                 <label>Рекомендованные переговорки</label>
                                                 {
-                                                    this.state.rooms.map((room, key) => (
+                                                    this.state.recommendedRooms.map((room, key) => (
                                                         <div key={key} className="room" onClick={() => this.chooseRoom(room)}>
                                                             <div className="info">
                                                                 <span className="time">{this.state.start}–{this.state.end}</span>

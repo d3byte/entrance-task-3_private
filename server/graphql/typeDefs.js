@@ -11,6 +11,7 @@ type User {
 input UserInput {
     login: String!
     homeFloor: Int
+    avatarUrl: String!
 }
 
 type UserRoom {

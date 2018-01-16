@@ -129,7 +129,6 @@ class Main extends Component {
     componentWillReceiveProps = props => {
         const { fetchData } = props
         if(fetchData) {
-            console.log(fetchData)
             let newEvents = this.handleEventData(fetchData.events)
             this.setState({ rooms: fetchData.rooms, events: newEvents, users: fetchData.users })
             this.setFloors(fetchData.rooms)
